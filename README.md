@@ -167,4 +167,11 @@ The compiled binaries will be output to the `release/` directory.
 
 ## License & Policies
 
-Distributed under custom fair-use terms. For DMCA notices and takedown requests, consult [Legal & DMCA Policies](https://playzae.github.io/playz_anime_landingpage/docs/policies/dmca).
+Distributed under custom fair-use terms. For DMCA notices and takedown requests, consult [Legal & DMCA Policies](https://playzae.github.io/playz_anime_landingpage/docs/policies/copyright-and-dmca) (or /docs/policies/dmca).
+
+> [!IMPORTANT]
+> The public web streaming instance has a high tendency to go down, face upstream blocks, or get taken down quickly. Domain changes for both the streaming website and landing page are coming soon.
+> 
+> To guarantee continuous, uninterrupted access:
+> - **Bookmark the landing page and GitHub:** Keep [playzae.github.io/playz_anime_landingpage](https://playzae.github.io/playz_anime_landingpage/) bookmarked for active mirrors and domain announcements.
+> - **Use this Desktop App:** The desktop app runs locally, streams directly, supports true offline downloads, and will never go down. Always check [PlayzAe/playz_anime_desktopapp](https://github.com/PlayzAe/playz_anime_desktopapp) for the latest updates and releases.
