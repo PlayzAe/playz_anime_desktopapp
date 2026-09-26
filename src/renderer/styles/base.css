@@ -1,0 +1,174 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--ink-0);
+  color: var(--paper);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  font-variation-settings: normal;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  user-select: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input,
+textarea {
+  user-select: text;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-4);
+  border: 3px solid var(--ink-0);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--paper-4);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.jp {
+  font-family: var(--font-jp);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.clamp-1,
+.clamp-2,
+.clamp-3,
+.clamp-4 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.clamp-1 {
+  -webkit-line-clamp: 1;
+}
+.clamp-2 {
+  -webkit-line-clamp: 2;
+}
+.clamp-3 {
+  -webkit-line-clamp: 3;
+}
+.clamp-4 {
+  -webkit-line-clamp: 4;
+}
+
+/* Condensed display type: Archivo's width axis does the poster-title work. */
+.display {
+  font-stretch: 72%;
+  font-weight: 780;
+  letter-spacing: -0.012em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.section-title {
+  font-size: 19px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+}
+
+.muted {
+  color: var(--paper-2);
+}
+.faint {
+  color: var(--paper-3);
+}
+
+.dot-sep > * + *::before {
+  content: '·';
+  margin: 0 0.5em;
+  color: var(--paper-4);
+}
+
+kbd {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--paper-2);
+  padding: 1px 5px;
+  border: 1px solid var(--line-2);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

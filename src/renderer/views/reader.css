@@ -1,0 +1,248 @@
+.reader {
+  position: relative;
+  height: 100vh;
+  background: #080706;
+  overflow: hidden;
+}
+
+/* ── Bars ── */
+
+.reader-top {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--window-controls) 0 10px;
+  background: rgb(12 11 10 / 0.96);
+  border-bottom: 1px solid var(--line);
+  -webkit-app-region: drag;
+  transition:
+    transform 240ms var(--ease),
+    opacity 240ms var(--ease);
+}
+.reader-top button,
+.reader-top .seg,
+.reader-top .menu-root {
+  -webkit-app-region: no-drag;
+}
+.reader.is-hidden .reader-top {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.reader-titles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.reader-series {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 650;
+  padding: 6px 8px;
+  border-radius: var(--radius-2);
+}
+.reader-series svg {
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.reader-series:hover {
+  background: var(--ink-3);
+}
+.reader-chapter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 340px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 6px 8px;
+  border-radius: var(--radius-2);
+  font-size: 13.5px;
+  font-weight: 560;
+  color: var(--paper-2);
+}
+.reader-chapter:hover {
+  background: var(--ink-3);
+  color: var(--paper);
+}
+.reader-drag {
+  flex: 1;
+  align-self: stretch;
+}
+.reader-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reader-bottom {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  pointer-events: none;
+}
+.reader-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 200ms var(--ease);
+}
+.reader-count {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  padding: 4px 9px;
+  border-radius: var(--radius-1);
+  background: rgb(12 11 10 / 0.8);
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--paper-2);
+  transition: opacity 240ms var(--ease);
+}
+.reader.is-hidden .reader-count {
+  opacity: 0;
+}
+
+/* ── Scroll mode ── */
+
+.reader-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.reader-loading {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.reader-scroll > .empty {
+  padding-top: 20vh;
+}
+.reader-failed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 18vh;
+}
+
+.reader-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 64px 16px 0;
+}
+/* Webtoons are drawn as one continuous strip; gaps would cut panels in half. */
+.reader-strip.is-webtoon {
+  gap: 0;
+}
+.reader-page {
+  position: relative;
+  width: 100%;
+  max-width: 920px;
+  min-height: 40vh;
+  background: var(--ink-1);
+}
+.reader-page:has(img[src]) {
+  min-height: 0;
+}
+.reader-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.reader-strip.fit-height .reader-page {
+  width: auto;
+  max-width: 100%;
+  height: calc(100vh - 20px);
+}
+.reader-strip.fit-height .reader-page img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* ── Page mode ── */
+
+.reader-paged {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 58px 20px 10px;
+}
+.reader-paged img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+}
+.reader-paged.fit-width img {
+  max-height: none;
+  width: min(100%, 1100px);
+}
+.reader-paged.fit-width {
+  overflow-y: auto;
+  place-items: start center;
+}
+.reader-zone {
+  position: absolute;
+  top: 52px;
+  bottom: 0;
+  width: 38%;
+  cursor: pointer;
+}
+.reader-zone.is-left {
+  left: 0;
+}
+.reader-zone.is-right {
+  right: 0;
+}
+.reader-zone:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: -6px;
+}
+
+/* ── End of chapter ── */
+
+.reader-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 90px 24px 140px;
+  text-align: center;
+}
+.reader-end h2 {
+  font-size: 30px;
+  font-stretch: 78%;
+  font-weight: 760;
+}
+.reader-end-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.reader-paged .reader-end {
+  padding: 0;
+}

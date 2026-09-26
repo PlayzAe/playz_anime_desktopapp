@@ -1,0 +1,312 @@
+.eps-loading {
+  padding: 48px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.eps-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.eps-spacer {
+  flex: 1;
+}
+.view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-2);
+}
+.view-toggle .icon-btn {
+  width: 30px;
+  height: 30px;
+}
+.eps-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-2);
+  background: var(--ink-1);
+  color: var(--paper-3);
+}
+.eps-filter:focus-within {
+  border-color: rgb(239 233 225 / 0.4);
+}
+.eps-filter input {
+  width: 150px;
+  background: none;
+  border: 0;
+  outline: none;
+  font-size: 13.5px;
+  color: var(--paper);
+}
+.eps-filter input::placeholder {
+  color: var(--paper-4);
+}
+
+/* ── Card grid (when the show has episode stills) ── */
+
+.eps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  gap: 24px 18px;
+}
+
+.ep {
+  position: relative;
+  min-width: 0;
+}
+.ep-open {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+.ep-open:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.ep-open:focus-visible {
+  outline: none;
+}
+.ep-open:focus-visible .ep-thumb {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+.ep-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ink-2);
+}
+.ep-thumb > .img {
+  position: absolute;
+  inset: 0;
+}
+.ep-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.ep-thumb-num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 64px;
+  color: rgb(239 233 225 / 0.85);
+  background: rgb(12 11 10 / 0.55);
+}
+.ep-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin: -21px 0 0 -21px;
+  border-radius: 50%;
+  background: rgb(239 233 225 / 0.92);
+  color: var(--ink-0);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+.ep-play svg {
+  margin-left: 2px;
+}
+.ep-open:hover .ep-play {
+  opacity: 1;
+  transform: none;
+}
+.ep-open:hover .ep-thumb img.is-loaded {
+  transform: scale(1.04);
+}
+.ep-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.ep-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 9px;
+}
+.ep-num {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--paper-3);
+}
+.ep-title {
+  font-size: 14px;
+  font-weight: 560;
+  line-height: 1.35;
+  color: var(--paper);
+}
+.ep-next {
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink-0);
+  font-size: 11px;
+  font-weight: 700;
+}
+.ep-flag {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--paper-3);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  padding: 0 5px;
+}
+
+.ep.is-watched .ep-thumb img.is-loaded {
+  opacity: 0.45;
+}
+.ep.is-watched .ep-title {
+  color: var(--paper-3);
+}
+.ep.is-unavailable .ep-open {
+  opacity: 0.5;
+}
+
+.ep-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--fast) var(--ease);
+}
+.ep-actions .icon-btn {
+  width: 30px;
+  height: 30px;
+  background: rgb(12 11 10 / 0.78);
+  color: var(--paper);
+}
+.ep-actions .icon-btn.is-active {
+  background: var(--paper);
+  color: var(--ink-0);
+}
+.ep:hover .ep-actions,
+.ep:focus-within .ep-actions {
+  opacity: 1;
+}
+/* A watched tick stays visible without hover. */
+.eps-grid .ep.is-watched .ep-actions {
+  opacity: 1;
+}
+.eps-grid .ep.is-watched .ep-actions .icon-btn:not(.is-active) {
+  display: none;
+}
+.eps-grid .ep.is-watched:hover .ep-actions .icon-btn:not(.is-active) {
+  display: inline-grid;
+}
+
+/* ── Row list (no stills available) ── */
+
+.eps-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+.eps-list .ep {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.eps-list .ep-open {
+  flex: 1;
+  padding: 12px 8px 12px 4px;
+  border-radius: var(--radius-1);
+}
+.eps-list .ep-open:hover {
+  background: var(--ink-1);
+}
+.eps-list .ep-text {
+  margin-top: 0;
+}
+.eps-list .ep-actions {
+  position: static;
+  opacity: 1;
+  padding-right: 4px;
+}
+.eps-list .ep-actions .icon-btn {
+  background: none;
+  color: var(--paper-3);
+}
+.eps-list .ep-actions .icon-btn.is-active {
+  background: none;
+  color: var(--paper);
+}
+.eps-list .ep.is-next .ep-num {
+  color: var(--paper);
+}
+.ep-progress-inline {
+  margin-top: 6px;
+  max-width: 220px;
+}
+
+.chapters .ep-open {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.chapters .ep-text {
+  flex: 1;
+  min-width: 0;
+}
+.chapter-meta {
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.source-note {
+  font-size: 13px;
+}
+.more-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.eps-foot {
+  margin-top: 28px;
+  font-size: 12.5px;
+}
+.eps-foot a {
+  color: var(--paper-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.trailer-frame {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-2);
+  overflow: hidden;
+  background: #000;
+}
+.trailer-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

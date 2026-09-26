@@ -1,0 +1,409 @@
+.player {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  color: var(--paper);
+  user-select: none;
+}
+.player.is-idle {
+  cursor: none;
+}
+/* Fullscreen always fills the screen exactly, whatever the page layout around the player was. */
+.player:fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  transform: none;
+}
+.player-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+
+/* ── Chrome that fades together ── */
+
+.player-top,
+.player-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transition: opacity 260ms var(--ease);
+}
+.player.is-idle .player-top,
+.player.is-idle .player-bottom {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.player-top {
+  top: 0;
+  padding: 16px 20px 40px;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.6), transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+/* The heading only matters when the page around the player is hidden. */
+.player.is-fullscreen .player-top {
+  opacity: 1;
+}
+.player.is-fullscreen.is-idle .player-top {
+  opacity: 0;
+}
+.player-heading {
+  display: flex;
+  flex-direction: column;
+}
+.player-series {
+  font-size: 13px;
+  color: var(--paper-2);
+}
+.player-episode {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.player-bottom {
+  bottom: 0;
+  padding: 50px 14px 8px;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0.35) 55%, transparent);
+}
+
+/* ── Subtitles ── */
+
+.player-cues {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 7%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+  transition: bottom 260ms var(--ease);
+}
+.player:not(.is-idle) .player-cues {
+  bottom: 96px;
+}
+.cue-line {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 10px 3px;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.58);
+  color: #fff;
+  /* Archivo has Latin only; the system fonts after it cover Arabic, Hebrew, CJK, Thai and Cyrillic. */
+  font-family: var(--font), 'Segoe UI', 'Noto Sans', 'Yu Gothic UI', 'Microsoft YaHei UI', 'Malgun Gothic', 'Leelawadee UI', sans-serif;
+  font-size: clamp(16px, 2.3vw, 30px);
+  font-weight: 560;
+  line-height: 1.32;
+  white-space: pre-line;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+  /* Each line takes its direction from its own text, so Arabic and Hebrew read right to left. */
+  unicode-bidi: plaintext;
+}
+.player.is-fullscreen .cue-line {
+  font-size: clamp(22px, 2.6vw, 42px);
+}
+
+/* ── Centre states ── */
+
+.player-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.player-bigplay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: -38px 0 0 -38px;
+  border-radius: 50%;
+  background: rgb(239 233 225 / 0.94);
+  color: var(--ink-0);
+  transition: transform var(--fast) var(--ease);
+}
+.player-bigplay svg {
+  margin-left: 4px;
+}
+.player-bigplay:hover {
+  transform: scale(1.05);
+}
+.player-flash {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  translate: -50% -50%;
+  padding: 8px 14px;
+  border-radius: var(--radius-2);
+  background: rgb(0 0 0 / 0.66);
+  font-size: 15px;
+  font-weight: 650;
+  pointer-events: none;
+  animation: fade-in 120ms var(--ease);
+}
+
+/* ── Skip & up next ── */
+
+.player-skip {
+  position: absolute;
+  right: 24px;
+  bottom: 104px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: var(--radius-2);
+  background: rgb(239 233 225 / 0.94);
+  color: var(--ink-0);
+  font-size: 14.5px;
+  font-weight: 700;
+  animation: toast-in 220ms var(--ease);
+}
+.player-skip kbd {
+  color: var(--ink-0);
+  border-color: rgb(12 11 10 / 0.3);
+}
+.player-skip:hover {
+  background: #fff;
+}
+.player.is-idle .player-skip {
+  bottom: 40px;
+}
+
+.player-upnext {
+  position: absolute;
+  right: 24px;
+  bottom: 104px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: var(--radius-3);
+  background: rgb(19 18 16 / 0.94);
+  border: 1px solid var(--line-2);
+  box-shadow: 0 20px 50px rgb(0 0 0 / 0.5);
+  animation: toast-in 240ms var(--ease);
+}
+.upnext-label {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--paper-3);
+}
+.upnext-title {
+  font-size: 15px;
+  font-weight: 650;
+}
+.upnext-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.upnext-play {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  border-radius: var(--radius-2);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+.upnext-play:hover {
+  background: var(--accent-hi);
+}
+.upnext-cancel {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-2);
+  color: var(--paper-2);
+  font-weight: 600;
+}
+.upnext-cancel:hover {
+  background: var(--ink-3);
+  color: var(--paper);
+}
+
+/* ── Seek bar ── */
+
+.seek {
+  position: relative;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+.seek:focus-visible {
+  outline: none;
+}
+.seek-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgb(239 233 225 / 0.2);
+  transition: height 120ms var(--ease);
+}
+.seek:hover .seek-track,
+.seek.is-scrubbing .seek-track {
+  height: 6px;
+}
+.seek-buffer,
+.seek-played,
+.seek-chapter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+.seek-buffer {
+  background: rgb(239 233 225 / 0.3);
+}
+/* Intro and credits read as lighter bands, so you can see where the episode proper starts and ends. */
+.seek-chapter {
+  background: rgb(239 233 225 / 0.22);
+  box-shadow:
+    inset 2px 0 0 rgb(0 0 0 / 0.55),
+    inset -2px 0 0 rgb(0 0 0 / 0.55);
+}
+.seek-played {
+  background: var(--accent);
+}
+.seek-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(0);
+  transition: transform 120ms var(--ease);
+}
+.seek:hover .seek-thumb,
+.seek.is-scrubbing .seek-thumb,
+.seek:focus-visible .seek-thumb {
+  transform: scale(1);
+}
+.seek-tip {
+  position: absolute;
+  bottom: 22px;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-1);
+  background: rgb(0 0 0 / 0.8);
+  font-size: 12.5px;
+  font-weight: 650;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.seek-tip em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--paper-2);
+}
+
+/* ── Button bar ── */
+
+.player-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+.pbtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-2);
+  color: var(--paper);
+  transition: background-color var(--fast) var(--ease);
+}
+.pbtn:hover {
+  background: rgb(239 233 225 / 0.12);
+}
+.pbtn.is-on {
+  color: var(--paper);
+  box-shadow: inset 0 -2px 0 var(--paper);
+  border-radius: var(--radius-2) var(--radius-2) 2px 2px;
+}
+.pspacer {
+  flex: 1;
+}
+.ptime {
+  margin-left: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.ptime .faint {
+  color: var(--paper-2);
+  font-weight: 500;
+}
+
+.pvol {
+  display: flex;
+  align-items: center;
+}
+.pvol input {
+  --fill: 100%;
+  width: 0;
+  opacity: 0;
+  height: 4px;
+  appearance: none;
+  background: linear-gradient(to right, var(--paper) var(--fill), rgb(239 233 225 / 0.25) var(--fill));
+  border-radius: 2px;
+  transition:
+    width 180ms var(--ease),
+    opacity 180ms var(--ease),
+    margin 180ms var(--ease);
+}
+.pvol:hover input,
+.pvol input:focus-visible {
+  width: 84px;
+  opacity: 1;
+  margin: 0 8px 0 2px;
+}
+.pvol input::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.player .menu-panel {
+  background: rgb(19 18 16 / 0.97);
+}
+
+/* ── Embed ── */
+
+.embed-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: #000;
+}

@@ -1,0 +1,202 @@
+.hero {
+  position: relative;
+  height: clamp(470px, 68vh, 700px);
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero.is-empty {
+  background: var(--ink-1);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  animation: hero-fade 700ms var(--ease);
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+}
+.hero-img {
+  position: absolute;
+  inset: 0;
+}
+.hero-img img {
+  animation: hero-drift 12s ease-out both;
+}
+/* A slow push-in on each slide; it ends and holds rather than looping. */
+@keyframes hero-drift {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.hero-blur {
+  position: absolute;
+  inset: -40px;
+}
+.hero-blur img {
+  filter: blur(48px) saturate(1.25) brightness(0.5);
+  transform: scale(1.15);
+}
+.hero-poster {
+  position: absolute;
+  right: calc(var(--gutter) + 90px);
+  bottom: 70px;
+  width: clamp(190px, 17vw, 250px);
+  aspect-ratio: 460 / 650;
+  border-radius: 8px;
+  box-shadow: 0 28px 60px rgb(0 0 0 / 0.55);
+}
+
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to top, var(--ink-0) 0%, rgb(12 11 10 / 0.72) 26%, rgb(12 11 10 / 0) 58%),
+    linear-gradient(to right, rgb(12 11 10 / 0.9) 0%, rgb(12 11 10 / 0.55) 34%, rgb(12 11 10 / 0) 66%),
+    linear-gradient(to bottom, rgb(12 11 10 / 0.55) 0, rgb(12 11 10 / 0) 120px);
+}
+
+.hero-body {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 58px;
+  width: min(620px, 56%);
+  animation: hero-body-in 520ms var(--ease);
+}
+@keyframes hero-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+  margin-bottom: 12px;
+}
+.hero-kicker strong {
+  color: var(--paper);
+  font-weight: 650;
+}
+
+.hero-title {
+  font-size: clamp(46px, 5.6vw, 88px);
+  color: var(--paper);
+  text-shadow: 0 2px 30px rgb(0 0 0 / 0.35);
+}
+
+.hero-meta {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--paper-2);
+}
+
+.hero-progress {
+  width: 240px;
+  height: 3px;
+  margin-top: 14px;
+  background: rgb(239 233 225 / 0.18);
+}
+.hero-progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.hero-desc {
+  margin-top: 14px;
+  max-width: 56ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgb(239 233 225 / 0.78);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* Tategaki: the native title set vertically, the way it sits on a Japanese spine. */
+.hero-native {
+  position: absolute;
+  top: calc(var(--titlebar) + 40px);
+  right: var(--gutter);
+  max-height: 56%;
+  overflow: hidden;
+  writing-mode: vertical-rl;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  color: rgb(239 233 225 / 0.6);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
+  animation: hero-fade 900ms var(--ease);
+}
+.is-poster .hero-native {
+  right: calc(var(--gutter) + 12px);
+}
+
+.hero-pager {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 60px;
+  display: flex;
+  gap: 14px;
+}
+.is-poster .hero-pager {
+  bottom: 28px;
+}
+.hero-pager button {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--paper-3);
+  font-size: 12px;
+  font-weight: 650;
+  transition: color var(--fast) var(--ease);
+}
+.hero-pager button:hover,
+.hero-pager button.is-current {
+  color: var(--paper);
+}
+.hero-pager-bar {
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: rgb(239 233 225 / 0.2);
+  overflow: hidden;
+}
+.hero-pager-bar span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--paper);
+  transform-origin: left;
+  animation: pager-fill linear forwards;
+}
+.hero-pager.is-paused .hero-pager-bar span {
+  animation-play-state: paused;
+}
+@keyframes pager-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

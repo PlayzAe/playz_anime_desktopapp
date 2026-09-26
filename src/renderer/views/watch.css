@@ -1,0 +1,247 @@
+.page.watch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 0;
+  height: 100vh;
+  min-height: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+.page.watch.is-theater {
+  grid-template-columns: minmax(0, 1fr) 0;
+}
+
+.watch-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.watch-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - var(--titlebar) - 116px);
+  background: #000;
+  flex: none;
+}
+.is-theater .watch-stage {
+  max-height: calc(100vh - var(--titlebar) - 84px);
+}
+
+.watch-local {
+  font-size: 12.5px;
+  color: var(--paper-3);
+  margin-right: 6px;
+}
+
+.stage-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  color: var(--paper-2);
+}
+.stage-message h2 {
+  color: var(--paper);
+  font-size: 19px;
+  font-weight: 660;
+}
+.stage-message p {
+  max-width: 480px;
+  font-size: 14px;
+}
+.stage-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.watch-stage > .empty {
+  position: absolute;
+  inset: 0;
+  justify-content: center;
+}
+
+.stage-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.stage-poster {
+  position: absolute;
+  inset: 0;
+}
+.stage-poster img {
+  filter: brightness(0.32) saturate(0.9);
+}
+.stage-loading-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  color: var(--paper);
+  font-size: 14px;
+  font-weight: 560;
+}
+
+.watch-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 24px 20px;
+}
+.watch-titles {
+  min-width: 0;
+}
+.watch-series {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+}
+.watch-series:hover {
+  color: var(--paper);
+}
+.watch-heading {
+  margin-top: 3px;
+  font-size: 22px;
+  font-weight: 680;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.watch-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── Episode side panel ── */
+
+.watch-side {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--line);
+  background: var(--ink-1);
+  overflow: hidden;
+}
+.is-theater .watch-side {
+  visibility: hidden;
+}
+.side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+}
+.side-head .section-title {
+  font-size: 16px;
+}
+.side-autoplay {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--paper-2);
+}
+.side-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 8px 16px;
+}
+.side-loading {
+  padding: 24px 12px;
+}
+
+.side-ep {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--radius-2);
+  text-align: left;
+}
+.side-ep:hover {
+  background: var(--ink-2);
+}
+.side-ep.is-current {
+  background: var(--ink-3);
+}
+.side-ep.is-current::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent);
+}
+.side-thumb {
+  flex: none;
+  width: 112px;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+}
+.side-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-1);
+  background: var(--ink-2);
+  font-size: 22px;
+  color: var(--paper-2);
+}
+.side-ep.is-current .side-num {
+  background: var(--ink-4);
+  color: var(--paper);
+}
+.side-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.side-ep-num {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--paper-3);
+}
+.side-now {
+  font-size: 11px;
+  color: var(--accent);
+}
+.side-ep-title {
+  font-size: 13.5px;
+  font-weight: 560;
+  line-height: 1.3;
+}
+.side-ep.is-watched .side-ep-title,
+.side-ep.is-watched .side-thumb {
+  opacity: 0.55;
+}
+.side-check {
+  flex: none;
+  color: var(--paper-3);
+}

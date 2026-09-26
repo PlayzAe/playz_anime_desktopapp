@@ -1,0 +1,197 @@
+/* ── Image ── */
+
+.img {
+  overflow: hidden;
+}
+.img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition:
+    opacity 320ms var(--ease),
+    transform 520ms var(--ease);
+}
+.img img.is-loaded {
+  opacity: 1;
+}
+
+/* ── Poster ── */
+
+.poster {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.poster-frame {
+  position: relative;
+  aspect-ratio: 460 / 650;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ink-2);
+}
+.poster-frame::after {
+  /* Hairline edge so dark covers don't melt into the page. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--line);
+  pointer-events: none;
+}
+.poster-frame > .img {
+  position: absolute;
+  inset: 0;
+}
+.poster:hover .poster-frame img.is-loaded {
+  transform: scale(1.04);
+}
+.poster:focus-visible {
+  outline: none;
+}
+.poster:focus-visible .poster-frame {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+.poster-title {
+  margin-top: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--paper);
+}
+.poster-meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--paper-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.poster-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 7px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--paper);
+  background: rgb(12 11 10 / 0.84);
+  border-radius: 3px;
+}
+
+/* A ribbon hanging from the top edge, like a real bookmark. */
+.poster-mark {
+  position: absolute;
+  top: -2px;
+  right: 8px;
+  color: var(--paper);
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+.poster-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.poster.is-skeleton {
+  pointer-events: none;
+}
+.skeleton-line {
+  height: 11px;
+  border-radius: 3px;
+  margin-top: 10px;
+}
+
+.skeleton {
+  background: linear-gradient(100deg, var(--ink-2) 30%, var(--ink-3) 50%, var(--ink-2) 70%);
+  background-size: 300% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* ── Grid ── */
+
+.poster-grid > .empty {
+  grid-column: 1 / -1;
+}
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+  gap: 30px 18px;
+}
+
+/* ── Shelf ── */
+
+.shelf {
+  margin-top: 46px;
+}
+.shelf-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 var(--gutter);
+  margin-bottom: 14px;
+}
+.shelf-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--paper-3);
+}
+.shelf-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.shelf-nav {
+  display: flex;
+  gap: 2px;
+}
+
+.shelf-track {
+  --fs: #000;
+  --fe: #000;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 162px;
+  gap: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px var(--gutter) 6px;
+  scroll-padding: 0 var(--gutter);
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, var(--fs) 0, #000 calc(var(--gutter) + 10px), #000 calc(100% - var(--gutter) - 10px), var(--fe) 100%);
+}
+.shelf-track::-webkit-scrollbar {
+  display: none;
+}
+.shelf-track > * {
+  scroll-snap-align: start;
+}
+.shelf-track.fade-start {
+  --fs: transparent;
+}
+.shelf-track.fade-end {
+  --fe: transparent;
+}
+.shelf-wide .shelf-track {
+  grid-auto-columns: 312px;
+}
+.shelf-ranked .shelf-track {
+  grid-auto-columns: 232px;
+  gap: 8px;
+}

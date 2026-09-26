@@ -1,0 +1,209 @@
+.home .hero + .shelf,
+.home .hero + .aired {
+  margin-top: 8px;
+}
+
+/* ── Continue watching: wide episode cards ── */
+
+.wide-card {
+  position: relative;
+  min-width: 0;
+}
+.wide-link {
+  display: block;
+}
+.wide-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ink-2);
+}
+.wide-frame > .img {
+  position: absolute;
+  inset: 0;
+}
+.wide-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(12 11 10 / 0.7), rgb(12 11 10 / 0) 55%);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: inherit;
+}
+.wide-link:hover .wide-frame img.is-loaded {
+  transform: scale(1.04);
+}
+.wide-play {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: rgb(239 233 225 / 0.92);
+  color: var(--ink-0);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+.wide-play svg {
+  margin-left: 2px;
+}
+.wide-link:hover .wide-play,
+.wide-link:focus-visible .wide-play {
+  opacity: 1;
+  transform: none;
+}
+.wide-ep {
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+  bottom: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--paper);
+}
+.wide-progress {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.wide-title {
+  margin-top: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.wide-meta {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--paper-3);
+}
+.wide-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: rgb(12 11 10 / 0.72);
+  color: var(--paper);
+  opacity: 0;
+}
+.wide-card:hover .wide-remove,
+.wide-remove:focus-visible {
+  opacity: 1;
+}
+
+.reading-card {
+  position: relative;
+  min-width: 0;
+}
+.reading-card:hover .wide-remove,
+.reading-card .wide-remove:focus-visible {
+  opacity: 1;
+}
+
+/* ── Just aired: a compact list, a change of pace between rows of art ── */
+
+.aired {
+  margin-top: 46px;
+}
+.aired-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 22px;
+  padding: 0 var(--gutter);
+}
+.aired-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 0;
+  border-bottom: 1px solid var(--line);
+  transition: background-color var(--fast) var(--ease);
+}
+.aired-row:hover .aired-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--paper-4);
+}
+.aired-thumb {
+  flex: none;
+  width: 40px;
+  height: 56px;
+  border-radius: 3px;
+}
+.aired-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.aired-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+.aired-meta {
+  font-size: 12.5px;
+  color: var(--paper-3);
+}
+.aired-go {
+  color: var(--paper-4);
+  transition: color var(--fast) var(--ease);
+}
+.aired-row:hover .aired-go {
+  color: var(--paper);
+}
+
+/* ── Top 10: condensed numerals set behind the covers ── */
+
+.ranked {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding-left: 70px;
+}
+.ranked-num {
+  position: absolute;
+  left: 0;
+  bottom: 18px;
+  font-size: 176px;
+  line-height: 0.74;
+  font-stretch: 62%;
+  font-weight: 820;
+  letter-spacing: -0.04em;
+  /* Solid, low-contrast numerals read like type pressed into the page. */
+  color: var(--ink-4);
+  transition: color var(--med) var(--ease);
+}
+.ranked:hover .ranked-num {
+  color: var(--paper-4);
+}
+.ranked-card {
+  position: relative;
+  width: 148px;
+  flex: none;
+}
+.ranked:hover .poster-frame img.is-loaded {
+  transform: scale(1.04);
+}
+
+/* ── Genre block ── */
+
+.genre-block {
+  margin-top: 54px;
+}
+.genre-tabs {
+  margin: 0 var(--gutter) 22px;
+}
+.genre-grid {
+  padding: 0 var(--gutter);
+}

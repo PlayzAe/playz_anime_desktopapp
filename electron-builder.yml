@@ -1,0 +1,72 @@
+# Packaging for Windows. `npm run dist` (or build.bat) produces, in release/:
+#   PlayzAnime-Setup-<version>.exe     installer: pick a folder, Start menu + desktop shortcuts, uninstaller
+#   PlayzAnime-Portable-<version>.exe  one file, no install; keeps its data in "PlayzAnime Data" beside it
+#   win-unpacked/PlayzAnime.exe        the app folder itself, runnable as-is
+appId: com.playzanime.desktop
+productName: PlayzAnime
+executableName: PlayzAnime
+copyright: Copyright © 2026 PlayzAnime
+
+directories:
+  output: release
+  buildResources: build
+
+# Reuse the Electron that npm already installed instead of downloading it again.
+electronDist: node_modules/electron/dist
+# Chromium ships ~50 locale files; English is enough for the UI and it trims the install.
+electronLanguages:
+  - en-US
+
+files:
+  - out/**/*
+  - build/icon.png
+  - package.json
+  - '!out/probe/**'
+asar: true
+compression: maximum
+
+# The Controlled-folder-access helper ships next to the app, in resources\tools.
+extraResources:
+  - from: tools
+    to: tools
+    filter: ['allow-folder-access.*']
+
+# Double-clicking a friend's shared profile opens PlayzAnime and imports it (installer builds).
+fileAssociations:
+  - ext: playzanime
+    name: PlayzAnime profile
+    description: A shared PlayzAnime profile
+    icon: build/icon.ico
+    role: Viewer
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: build/icon.ico
+  legalTrademarks: PlayzAnime
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: PlayzAnime
+  menuCategory: false
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeaderIcon: build/icon.ico
+  installerSidebar: build/installerSidebar.bmp
+  uninstallerSidebar: build/installerSidebar.bmp
+  uninstallDisplayName: PlayzAnime
+  artifactName: PlayzAnime-Setup-${version}.${ext}
+
+portable:
+  artifactName: PlayzAnime-Portable-${version}.${ext}
+  splashImage: null

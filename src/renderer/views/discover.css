@@ -1,0 +1,99 @@
+.discover-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.discover-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 24px var(--gutter) 0;
+}
+.discover-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 280px;
+  max-width: 420px;
+  height: 36px;
+  padding: 0 10px 0 12px;
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-2);
+  color: var(--paper-3);
+}
+.discover-search:focus-within {
+  border-color: rgb(239 233 225 / 0.45);
+}
+.discover-search input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: none;
+  font-size: 14px;
+  color: var(--paper);
+}
+.discover-search input::placeholder {
+  color: var(--paper-4);
+}
+.discover-search button {
+  display: grid;
+  place-items: center;
+  color: var(--paper-3);
+}
+.discover-search button:hover {
+  color: var(--paper);
+}
+
+.genre-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px var(--gutter) 0;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-1);
+  background: var(--ink-2);
+  color: var(--paper-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition:
+    background-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+.chip:hover {
+  background: var(--ink-3);
+  color: var(--paper);
+}
+.chip.is-on {
+  background: var(--paper);
+  color: var(--ink-0);
+}
+
+.discover-alias {
+  padding: 16px var(--gutter) 0;
+  font-size: 13px;
+  color: var(--paper-3);
+}
+.discover-alias strong {
+  color: var(--paper);
+}
+
+.discover-results {
+  padding: 28px var(--gutter) 0;
+}
+.discover-sentinel {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0 8px;
+  font-size: 13px;
+}

@@ -1,0 +1,230 @@
+.detail-head {
+  position: relative;
+  padding-top: 186px;
+  isolation: isolate;
+}
+
+.detail-backdrop {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 440px;
+  overflow: hidden;
+}
+.detail-backdrop > .img {
+  position: absolute;
+  inset: 0;
+}
+.detail-backdrop.is-cover > .img {
+  inset: -40px;
+}
+.detail-backdrop.is-cover img {
+  filter: blur(40px) saturate(1.2) brightness(0.55);
+  transform: scale(1.1);
+}
+.detail-backdrop::after {
+  /* The cover's own colour washes into the page, then the page takes over. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, var(--ink-0) 4%, rgb(12 11 10 / 0.6) 45%, rgb(12 11 10 / 0.25) 75%, rgb(12 11 10 / 0.55) 100%),
+    linear-gradient(to right, var(--tint, transparent), transparent 70%);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 48px;
+  gap: 36px;
+  padding: 0 var(--gutter);
+  align-items: start;
+}
+
+.detail-poster {
+  position: relative;
+  aspect-ratio: 460 / 650;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 22px 50px rgb(0 0 0 / 0.5);
+}
+.detail-poster > .img {
+  position: absolute;
+  inset: 0;
+}
+.detail-poster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+.detail-info {
+  min-width: 0;
+  padding-top: 64px;
+}
+.detail-kicker {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+}
+.detail-title {
+  margin-top: 10px;
+  font-size: clamp(40px, 4.6vw, 70px);
+}
+.detail-alt {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--paper-3);
+}
+.detail-genres {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--paper-2);
+}
+.detail-genres a:hover {
+  color: var(--paper);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.detail-genre-sep {
+  margin: 0 8px;
+  color: var(--paper-4);
+}
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.detail-desc {
+  margin-top: 20px;
+  max-width: 74ch;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--paper-2);
+  white-space: pre-line;
+}
+.detail-more {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--paper);
+}
+.detail-more:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.detail-native {
+  justify-self: end;
+  padding-top: 64px;
+  max-height: 420px;
+  overflow: hidden;
+  writing-mode: vertical-rl;
+  font-size: 20px;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  color: var(--paper-3);
+}
+
+/* ── Body ── */
+
+.detail-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 48px;
+  padding: 40px var(--gutter) 0;
+  align-items: start;
+}
+.detail-main {
+  min-width: 0;
+}
+.detail-tabs {
+  margin-bottom: 22px;
+}
+
+/* ── Facts ── */
+
+.detail-facts {
+  position: sticky;
+  top: calc(var(--titlebar) + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.facts-next {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: var(--radius-2);
+  background: var(--ink-2);
+}
+.facts-next-label {
+  font-size: 12px;
+  font-weight: 620;
+  color: var(--paper-3);
+}
+.facts-next-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+.facts-next .faint {
+  font-size: 12.5px;
+}
+.facts-list {
+  display: flex;
+  flex-direction: column;
+}
+.facts-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+}
+.facts-row dt {
+  color: var(--paper-3);
+}
+.facts-row dd {
+  color: var(--paper);
+}
+.facts-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag {
+  padding: 3px 8px;
+  border-radius: var(--radius-1);
+  background: var(--ink-2);
+  color: var(--paper-2);
+  font-size: 12px;
+  font-weight: 560;
+}
+
+.relation {
+  color: var(--paper-2);
+}
+
+.notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border-radius: var(--radius-2);
+  background: var(--ink-2);
+  color: var(--paper-2);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.notice svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--warn);
+}

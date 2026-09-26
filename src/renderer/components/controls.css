@@ -1,0 +1,349 @@
+/* ── Buttons ── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-2);
+  font-weight: 620;
+  white-space: nowrap;
+  transition:
+    background-color var(--fast) var(--ease),
+    color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-sm {
+  height: 30px;
+  padding: 0 11px;
+  font-size: 13px;
+  gap: 6px;
+}
+.btn-md {
+  height: 38px;
+  padding: 0 15px;
+  font-size: 14px;
+}
+.btn-lg {
+  height: 46px;
+  padding: 0 22px 0 18px;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hi);
+}
+
+.btn-solid {
+  background: var(--ink-3);
+  color: var(--paper);
+}
+.btn-solid:hover:not(:disabled) {
+  background: var(--ink-4);
+}
+
+.btn-ghost {
+  border: 1px solid var(--line-2);
+  color: var(--paper);
+  background: rgb(12 11 10 / 0.25);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgb(239 233 225 / 0.08);
+  border-color: rgb(239 233 225 / 0.28);
+}
+
+.btn-quiet {
+  color: var(--paper-2);
+}
+.btn-quiet:hover:not(:disabled) {
+  color: var(--paper);
+  background: var(--ink-2);
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-2);
+  color: var(--paper-2);
+  transition:
+    background-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+.icon-btn:hover:not(:disabled) {
+  background: var(--ink-3);
+  color: var(--paper);
+}
+.icon-btn.is-active {
+  color: var(--paper);
+  background: var(--ink-3);
+}
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ── Segmented ── */
+
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--ink-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-2);
+}
+.seg button {
+  height: 30px;
+  padding: 0 13px;
+  border-radius: 5px;
+  color: var(--paper-3);
+  font-size: 13px;
+  font-weight: 620;
+  white-space: nowrap;
+  transition:
+    background-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+.seg-sm button {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+.seg button:hover:not(:disabled) {
+  color: var(--paper);
+}
+.seg button[aria-pressed='true'] {
+  background: var(--ink-4);
+  color: var(--paper);
+}
+.seg button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Tabs ── */
+
+.tabs {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--line);
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tabs button {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  color: var(--paper-3);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color var(--fast) var(--ease);
+}
+.tabs button:hover {
+  color: var(--paper-2);
+}
+.tabs button[aria-selected='true'] {
+  color: var(--paper);
+}
+.tabs button[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--paper);
+}
+.tab-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--paper-3);
+}
+
+/* ── Switch: squared track and knob, matching the icon set ── */
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 22px;
+  border-radius: 5px;
+  background: var(--ink-4);
+  transition: background-color var(--med) var(--ease);
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--paper-3);
+  transition:
+    transform var(--med) var(--ease),
+    background-color var(--med) var(--ease);
+}
+.switch[aria-checked='true'] {
+  background: var(--paper);
+}
+.switch[aria-checked='true']::after {
+  transform: translateX(18px);
+  background: var(--ink-0);
+}
+
+/* ── Menu / Select ── */
+
+.menu-root {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 80;
+  padding: 5px;
+  background: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-3);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.5);
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+  animation: menu-in 120ms var(--ease);
+}
+.menu-panel.is-up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+.menu-panel.is-right {
+  left: auto;
+  right: 0;
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.menu-heading {
+  padding: 8px 10px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--paper-3);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px 6px 6px;
+  border-radius: 5px;
+  text-align: left;
+  color: var(--paper);
+  font-size: 13.5px;
+}
+.menu-item:hover:not(:disabled),
+.menu-item:focus-visible {
+  background: var(--ink-4);
+  outline: none;
+}
+.menu-item:disabled {
+  color: var(--paper-4);
+  cursor: default;
+}
+.menu-item.is-danger {
+  color: var(--bad);
+}
+.menu-item-icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  flex: none;
+  color: var(--paper-2);
+}
+.menu-item-label {
+  flex: 1;
+  min-width: 0;
+}
+.menu-item-hint {
+  color: var(--paper-3);
+  font-size: 12px;
+}
+.menu-divider {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--line);
+}
+
+.select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px 0 12px;
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-2);
+  color: var(--paper);
+  font-size: 13.5px;
+  font-weight: 560;
+  transition: border-color var(--fast) var(--ease);
+}
+.select:hover,
+.select.is-open {
+  border-color: rgb(239 233 225 / 0.3);
+}
+.select-prefix {
+  color: var(--paper-3);
+  font-weight: 500;
+}
+.select-value {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.select svg {
+  color: var(--paper-3);
+}
+
+/* ── Progress ── */
+
+.progress {
+  height: 3px;
+  background: rgb(239 233 225 / 0.14);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--med) linear;
+}

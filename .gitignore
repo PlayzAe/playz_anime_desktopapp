@@ -1,0 +1,8 @@
+node_modules/
+out/
+release/
+*.log
+build/.icon-render.html
+
+# seanime is downloaded here as a design reference only (GPL-3.0). Never ship or commit it.
+reference/

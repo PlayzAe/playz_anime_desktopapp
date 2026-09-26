@@ -1,0 +1,321 @@
+.app {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+}
+.app.is-immersive {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.main {
+  position: relative;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: auto;
+}
+.main::-webkit-scrollbar-track {
+  margin-top: var(--titlebar);
+}
+
+.page {
+  padding-top: var(--titlebar);
+  padding-bottom: 72px;
+  min-height: 100vh;
+  animation: page-in 200ms var(--ease);
+}
+.page.is-flush {
+  padding-top: 0;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.page-head {
+  padding: 28px var(--gutter) 0;
+}
+.page-title {
+  font-size: 34px;
+}
+.page-sub {
+  margin-top: 6px;
+  color: var(--paper-2);
+  font-size: 14px;
+}
+
+/* ── Rail ── */
+
+.rail {
+  position: relative;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--ink-1);
+  border-right: 1px solid var(--line);
+  padding: 10px 0 14px;
+}
+
+.rail-logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  transition: transform var(--fast) var(--ease);
+}
+.rail-logo:hover {
+  transform: rotate(-4deg);
+}
+
+.rail-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rail-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rail-item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 44px;
+  border-radius: var(--radius-2);
+  color: var(--paper-3);
+  transition:
+    color var(--fast) var(--ease),
+    background-color var(--fast) var(--ease);
+}
+.rail-item:hover {
+  color: var(--paper);
+  background: var(--ink-3);
+}
+.rail-item.is-current {
+  color: var(--paper);
+  background: var(--ink-3);
+}
+.rail-item.is-current::before {
+  content: '';
+  position: absolute;
+  left: -11px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--paper);
+}
+
+/* Label tooltip to the right of the rail. */
+.rail-item::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  translate: -4px -50%;
+  padding: 5px 9px;
+  border-radius: var(--radius-1);
+  background: var(--paper);
+  color: var(--ink-0);
+  font-size: 12.5px;
+  font-weight: 620;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--fast) var(--ease),
+    translate var(--fast) var(--ease);
+}
+.rail-item:hover::after,
+.rail-item:focus-visible::after {
+  opacity: 1;
+  translate: 0 -50%;
+}
+
+.rail-badge {
+  position: absolute;
+  top: 5px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink-0);
+  font-size: 10.5px;
+  font-weight: 750;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* ── Title bar ── */
+
+.titlebar {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: var(--rail);
+  right: 0;
+  height: var(--titlebar);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--window-controls) 0 12px;
+  -webkit-app-region: drag;
+  transition:
+    background-color var(--med) var(--ease),
+    border-color var(--med) var(--ease);
+  border-bottom: 1px solid transparent;
+}
+.is-immersive .titlebar {
+  left: 0;
+}
+.titlebar.is-solid {
+  background: var(--ink-0);
+  border-bottom-color: var(--line);
+}
+.titlebar button,
+.titlebar a {
+  -webkit-app-region: no-drag;
+}
+
+.tb-nav {
+  display: flex;
+  gap: 2px;
+}
+.tb-nav .icon-btn {
+  width: 32px;
+  height: 30px;
+}
+
+.tb-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(380px, 40vw);
+  height: 30px;
+  padding: 0 8px 0 11px;
+  border-radius: var(--radius-2);
+  background: rgb(27 25 23 / 0.72);
+  border: 1px solid var(--line);
+  color: var(--paper-3);
+  font-size: 13px;
+  text-align: left;
+  transition:
+    border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+.tb-search:hover {
+  border-color: var(--line-2);
+  color: var(--paper-2);
+}
+.tb-search > span:first-of-type {
+  flex: 1;
+}
+.tb-keys {
+  display: flex;
+  gap: 3px;
+}
+
+.tb-drag {
+  flex: 1;
+  align-self: stretch;
+}
+
+.tb-activity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--radius-2);
+  color: var(--paper);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.tb-activity:hover {
+  background: var(--ink-3);
+}
+.tb-offline {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-2);
+  background: color-mix(in oklab, var(--warn) 14%, transparent);
+  color: var(--warn);
+  font-size: 12.5px;
+  font-weight: 660;
+}
+.tb-offline:hover {
+  background: color-mix(in oklab, var(--warn) 22%, transparent);
+}
+
+/* The profile seal at the foot of the rail. */
+.rail-profile .avatar {
+  transition: box-shadow var(--fast) var(--ease);
+}
+.rail-profile.is-current .avatar,
+.rail-profile:hover .avatar {
+  box-shadow: 0 0 0 2px var(--ink-1), 0 0 0 3.5px var(--paper-3);
+}
+
+/* ── Toasts ── */
+
+.toasts {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: 24px;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 520px;
+  padding: 10px 12px 10px 14px;
+  border-radius: var(--radius-2);
+  background: var(--paper);
+  color: var(--ink-0);
+  font-size: 13.5px;
+  font-weight: 560;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.45);
+  pointer-events: auto;
+  animation: toast-in 220ms var(--ease);
+}
+.toast.is-error {
+  background: #3a1d19;
+  color: #ffd9d3;
+}
+.toast-action {
+  margin-left: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-1);
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

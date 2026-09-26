@@ -1,0 +1,154 @@
+/* ── Avatar: a photo, or a seal carved with an initial ── */
+
+.avatar {
+  position: relative;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  /* Same corner ratio as the app seal (9/64). */
+  border-radius: 14%;
+  background: var(--ink-3);
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar.is-seal {
+  background: var(--seal);
+  color: var(--seal-carve);
+  font-weight: 800;
+  font-stretch: 80%;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  /* A carved edge, inset a little from the rim like the logo frame. */
+  box-shadow: inset 0 0 0 max(1.5px, 0.05em) color-mix(in oklab, var(--seal) 60%, var(--seal-carve));
+}
+
+/* ── Profile fields (onboarding + editor) ── */
+
+.pf {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.pf-identity {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+.pf-picture {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--paper-3);
+  border-radius: var(--radius-2);
+}
+.pf-picture:hover {
+  color: var(--paper);
+}
+.pf-picture:hover .avatar {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+.pf-picture-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 620;
+}
+.pf-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pf-text .input {
+  width: 100%;
+}
+.pf-remove {
+  align-self: flex-start;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--paper-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.pf-remove:hover {
+  color: var(--paper);
+}
+
+.pf-favs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.pf-fav-row,
+.pf-fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 8px;
+}
+.pf-fav-grid {
+  max-height: 232px;
+  overflow-y: auto;
+  padding: 2px 4px 2px 2px;
+}
+.pf-fav {
+  position: relative;
+  aspect-ratio: 460 / 650;
+  border-radius: var(--radius-1);
+  overflow: hidden;
+  background: var(--ink-2);
+}
+.pf-fav > .img {
+  width: 100%;
+  height: 100%;
+}
+.pf-fav-grid .pf-fav:not(.is-on) > .img {
+  opacity: 0.55;
+  transition: opacity var(--fast) var(--ease);
+}
+.pf-fav-grid .pf-fav:hover > .img {
+  opacity: 1;
+}
+.pf-fav-grid .pf-fav.is-on {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.pf-fav-check {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.pf-fav-x {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  min-width: 0;
+  background: rgb(12 11 10 / 0.8);
+  opacity: 0;
+}
+.pf-fav:hover .pf-fav-x,
+.pf-fav-x:focus-visible {
+  opacity: 1;
+}
+.pf-empty {
+  font-size: 13px;
+  color: var(--paper-3);
+}

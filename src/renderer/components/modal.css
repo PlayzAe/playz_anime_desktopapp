@@ -1,0 +1,98 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(8 7 6 / 0.66);
+  animation: fade-in 140ms var(--ease);
+}
+
+.modal {
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-3);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+  animation: palette-in 180ms var(--ease);
+  outline: none;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 14px 6px 22px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 680;
+}
+.modal-body {
+  padding: 8px 22px 20px;
+  overflow-y: auto;
+}
+.modal.is-bare .modal-body {
+  padding: 0 14px 14px;
+}
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+}
+
+/* Form rows used inside dialogs and settings. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+.field:first-child {
+  margin-top: 4px;
+}
+.field-label {
+  font-size: 13px;
+  font-weight: 620;
+  color: var(--paper-2);
+}
+.field-note {
+  font-size: 12.5px;
+  color: var(--paper-3);
+  line-height: 1.5;
+}
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.input {
+  height: 36px;
+  padding: 0 11px;
+  background: var(--ink-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-2);
+  color: var(--paper);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--fast) var(--ease);
+}
+.input:focus {
+  border-color: rgb(239 233 225 / 0.45);
+}
+.input::placeholder {
+  color: var(--paper-4);
+}
+.input.is-num {
+  width: 84px;
+  font-variant-numeric: tabular-nums;
+}

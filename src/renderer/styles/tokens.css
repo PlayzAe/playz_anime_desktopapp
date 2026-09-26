@@ -1,0 +1,75 @@
+/*
+ * PlayzAnime design tokens.
+ *
+ * Direction: a late-night screening room. Warm ink blacks (not blue-slate) so
+ * poster art carries the colour, warm paper whites for text, and a single
+ * accent borrowed from seal ink (shu, 朱) used only where the user acts or
+ * progresses: the primary play action, progress bars, the seal mark.
+ * Dark by design: this is a video player people use with the lights down.
+ */
+
+:root {
+  --ink-0: #0c0b0a;
+  --ink-1: #131210;
+  --ink-2: #1b1917;
+  --ink-3: #252220;
+  --ink-4: #302d2a;
+
+  --line: rgb(236 229 219 / 0.08);
+  --line-2: rgb(236 229 219 / 0.15);
+
+  --paper: #efe9e1;
+  --paper-2: #b8b1a7;
+  --paper-3: #8a8379;
+  --paper-4: #5f5952;
+
+  --seal-carve: #f6efe4;
+  --accent-ink: #160906;
+
+  --good: #93c48d;
+  --warn: #e8b85e;
+  --bad: #ea6b60;
+
+  --radius-1: 4px;
+  --radius-2: 7px;
+  --radius-3: 12px;
+
+  --rail: 68px;
+  --titlebar: 40px;
+  --gutter: 44px;
+  /* Room for the native minimise/maximise/close buttons on Windows. */
+  --window-controls: 144px;
+
+  --font: 'Archivo Variable', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-jp: 'Yu Gothic UI', 'Yu Gothic', 'Meiryo UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --fast: 140ms;
+  --med: 240ms;
+}
+
+/* Accent options, named after traditional Japanese colours. */
+:root[data-accent='shu'] {
+  --accent: #f0532c;
+  --accent-hi: #ff6b45;
+}
+:root[data-accent='matcha'] {
+  --accent: #9dbb5c;
+  --accent-hi: #b1cf70;
+}
+:root[data-accent='ai'] {
+  --accent: #6f8fe6;
+  --accent-hi: #86a3f2;
+}
+:root[data-accent='yamabuki'] {
+  --accent: #f3aa36;
+  --accent-hi: #ffbd55;
+}
+:root[data-accent='sakura'] {
+  --accent: #ee83a1;
+  --accent-hi: #f79bb4;
+}
+
+:root {
+  --accent-soft: color-mix(in oklab, var(--accent) 18%, transparent);
+}

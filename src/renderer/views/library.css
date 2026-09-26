@@ -1,0 +1,71 @@
+.library-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.library-tabs {
+  margin: 24px var(--gutter) 0;
+}
+.library-body {
+  padding: 26px var(--gutter) 0;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.history-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 6px;
+  border-radius: var(--radius-2);
+}
+.history-link:hover {
+  background: var(--ink-1);
+}
+.history-thumb {
+  flex: none;
+  width: 104px;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+}
+.history-thumb.is-cover {
+  width: 42px;
+  aspect-ratio: 460 / 650;
+  margin: 0 31px;
+}
+.history-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.history-title {
+  font-size: 14.5px;
+  font-weight: 620;
+}
+.history-meta {
+  font-size: 13px;
+  color: var(--paper-3);
+}
+.history-when {
+  flex: none;
+  font-size: 12.5px;
+}
+.history-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}

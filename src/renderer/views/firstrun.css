@@ -1,0 +1,350 @@
+.firstrun {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--titlebar) + 24px) 32px 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--ink-0);
+}
+
+/* ── Brand, progress ── */
+
+.fr-brand-seal {
+  display: inline-flex;
+}
+.fr-progress {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgb(239 233 225 / 0.06);
+}
+.fr-progress span {
+  display: block;
+  height: 100%;
+  transform-origin: left;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 60%, transparent), var(--accent-hi));
+  box-shadow: 0 0 16px var(--accent);
+}
+.fr-word {
+  display: inline-block;
+  margin-right: 0.24em;
+}
+
+.fr-drag {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: var(--window-controls);
+  height: var(--titlebar);
+  -webkit-app-region: drag;
+}
+.fr-brand {
+  position: fixed;
+  top: 12px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 720;
+  font-stretch: 85%;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  color: var(--paper-2);
+}
+
+.fr-stage {
+  position: relative;
+  width: 100%;
+}
+.fr-ring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+/* A slow turning corona behind the seal. */
+.fr-halo {
+  position: absolute;
+  width: 330px;
+  height: 330px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent, color-mix(in oklab, var(--accent) 40%, transparent), transparent 40%, color-mix(in oklab, var(--accent-hi) 25%, transparent), transparent 80%);
+  filter: blur(34px);
+  opacity: 0.55;
+  animation: fr-turn 9s linear infinite;
+}
+@keyframes fr-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fr-spin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  border-right-color: transparent;
+}
+.fr-card-icon {
+  position: relative;
+}
+.fr-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  animation: fr-ping 1.8s var(--ease) infinite;
+}
+@keyframes fr-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+/* A light sweep across the main call to action. */
+.fr-cta {
+  position: relative;
+  overflow: hidden;
+}
+.fr-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: fr-sweep 3.2s 1.2s ease-in-out infinite;
+}
+@keyframes fr-sweep {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+/* Onboarding: a dashed ring turns around the picture; fields arrive one after another. */
+.fr-profile .pf-picture::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: calc(50% - 60px);
+  width: 120px;
+  height: 120px;
+  border-radius: 18%;
+  border: 1.5px dashed color-mix(in oklab, var(--accent) 70%, transparent);
+  animation: fr-turn 14s linear infinite;
+  pointer-events: none;
+}
+.fr-profile .pf-identity > *,
+.fr-profile .pf-favs,
+.fr-profile .fr-actions {
+  animation: fr-up 0.6s var(--ease) both;
+}
+.fr-profile .pf-identity > :nth-child(1) {
+  animation-delay: 0.25s;
+}
+.fr-profile .pf-identity > :nth-child(3) {
+  animation-delay: 0.35s;
+}
+.fr-profile .pf-favs {
+  animation-delay: 0.45s;
+}
+.fr-profile .fr-actions {
+  animation-delay: 0.55s;
+}
+@keyframes fr-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fr-halo,
+  .fr-cta::after,
+  .fr-pulse,
+  .fr-profile .pf-picture::before {
+    animation: none;
+  }
+}
+
+/* ── Preparing ── */
+
+.fr-prepare {
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 72px;
+}
+.fr-title {
+  font-size: 38px;
+  line-height: 1.05;
+}
+.fr-sub {
+  margin-top: 12px;
+  max-width: 460px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--paper-2);
+}
+.fr-sub b {
+  color: var(--paper);
+  font-weight: 640;
+}
+
+.fr-steps {
+  list-style: none;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fr-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14.5px;
+  color: var(--paper-4);
+  transition: color var(--med) var(--ease);
+}
+.fr-step.is-run,
+.fr-step.is-done,
+.fr-step.is-warn {
+  color: var(--paper);
+}
+.fr-step-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 4px;
+  border: 1.5px solid var(--line-2);
+}
+.fr-step-mark {
+  transition:
+    background-color 240ms var(--ease),
+    border-color 240ms var(--ease),
+    box-shadow 240ms var(--ease);
+}
+.fr-step.is-run .fr-step-mark {
+  border-color: transparent;
+}
+.fr-step.is-done .fr-step-mark {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 0 14px color-mix(in oklab, var(--accent) 55%, transparent);
+}
+.fr-step.is-warn .fr-step-mark {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+@keyframes fr-pulse {
+  50% {
+    background: var(--accent-soft);
+  }
+}
+.fr-step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fr-step-note {
+  font-size: 12.5px;
+  color: var(--paper-3);
+}
+.fr-step.is-warn .fr-step-note {
+  color: var(--warn);
+}
+
+/* ── Cards: folder protection, profile ── */
+
+.fr-card {
+  max-width: 640px;
+}
+.fr-card-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.fr-paths {
+  list-style: none;
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fr-paths li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-2);
+  background: var(--ink-1);
+  border: 1px solid var(--line);
+  color: var(--paper-3);
+  font-size: 13px;
+}
+.fr-path-kind {
+  font-weight: 640;
+  color: var(--paper-2);
+}
+.fr-path {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+  color: var(--paper);
+}
+.fr-path.is-blocked {
+  color: var(--paper-3);
+  text-decoration: line-through;
+  text-decoration-color: rgb(234 107 96 / 0.7);
+}
+.fr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+.fr-fine {
+  margin-top: 14px;
+  max-width: 540px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--paper-3);
+}
+.fr-profile .pf {
+  margin-top: 28px;
+}
+
+@media (max-width: 1100px) {
+  .fr-prepare {
+    gap: 48px;
+  }
+}
+
+/* The seal from the opening, resting in its light on the setup screen. */
+.fr-seal {
+  position: relative;
+  display: inline-flex;
+  filter: drop-shadow(0 22px 48px color-mix(in oklab, var(--accent) 45%, transparent));
+}
