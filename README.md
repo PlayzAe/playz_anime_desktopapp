@@ -1,10 +1,10 @@
-<p align="center">
+﻿<p align="center">
   <a href="https://playzae.github.io/playz_anime_landingpage/">
     <img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/icon.png" alt="PlayzAnime Logo" width="75px" />
   </a>
 </p>
 
-<h1 align="center"><b>PlayzAnime  -  Desktop Edition</b></h1>
+<h1 align="center"><b>PlayzAnime - Desktop Edition</b></h1>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/og.png" alt="PlayzAnime Preview" width="100%" />
@@ -13,9 +13,9 @@
 <p align="center">
   <a href="https://playzae.github.io/playz_anime_landingpage/">Website</a> |
   <a href="https://playz-anime.onrender.com">Web App</a> |
-  <a href="https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime">Latest Release</a> |
+  <a href="https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime">Download Release</a> |
   <a href="#features">Features</a> |
-  <a href="#why-playzanime-vs-seanime">Why PlayzAnime?</a> |
+  <a href="#why-i-built-playzanime-inspiration--better-downloads">Why PlayzAnime?</a> |
   <a href="https://playzae.github.io/playz_anime_landingpage/docs/policies/dmca">Copyright</a>
 </p>
 
@@ -27,10 +27,8 @@
   <img src="https://img.shields.io/badge/Electron-30+-2b2622?style=flat-square&logo=electron" alt="Electron" />
   <img src="https://img.shields.io/badge/React-19-2b2622?style=flat-square&logo=react" alt="React 19" />
   <img src="https://img.shields.io/badge/Ads-None-93c48d?style=flat-square" alt="No ads" />
-  <a href="https://github.com/PlayzAe"><img src="https://img.shields.io/static/v1?label=Support&message=%E2%9D%A4&style=flat-square&logo=GitHub&color=%23f0532c" alt="Support" /></a>
+  <a href="https://github.com/PlayzAe"><img src="https://img.shields.io/static/v1?label=Support&message=GitHub&style=flat-square&logo=GitHub&color=%23f0532c" alt="Support" /></a>
 </div>
-
-<h5 align="center">If PlayzAnime is useful to you, leave a star or follow on <a href="https://github.com/PlayzAe">GitHub</a>! ⭐️</h5>
 
 <br>
 
@@ -38,16 +36,16 @@
 
 I built **PlayzAnime Desktop** because I wanted a clean, fast, standalone Windows app for **watching and downloading anime** and **reading and downloading manga, manhwa, and manhua** without dealing with web ads, slow torrent swarms, or bloated media servers.
 
-All metadata, trending lists, and schedules are synced directly from AniList. Anime streams and manga chapters are fetched straight from resilient online sources. My app features its own native video player, a responsive manga reader, offline media library storage, and portable profiles you can easily export and share with friends as a file.
+All metadata, trending lists, and seasonal schedules sync directly from AniList. Anime streams and manga chapters are fetched straight from resilient online sources. My app features its own native video player, a responsive manga reader, offline media library storage, and portable profiles you can easily export and share with friends as a file.
 
 > [!IMPORTANT]
 > PlayzAnime does not host, upload, or distribute any media. It parses content that third-party sites already make publicly available. Users are responsible for complying with their local copyright laws.
 
 ---
 
-## Why PlayzAnime? (Inspiration & How I Handle Downloads Better)
+## Why I Built PlayzAnime (Inspiration & Better Downloads)
 
-[Seanime](https://github.com/5rahim/seanime) was a huge inspiration for my UI layout, tracker integration, and overall vision. But if you've ever looked through media server issue trackers, you know the biggest headaches: **torrents dying, buffering holes, and download corruption.**
+[Seanime](https://github.com/5rahim/seanime) was a huge inspiration for my UI layout, tracker integration, and overall vision. But if you have ever looked through community issue trackers, you know the biggest headaches with traditional anime media servers: **torrents dying, buffer holes, and download corruption.**
 
 Most media servers depend heavily on BitTorrent protocols:
 - If a torrent has **0 seeders**, your download is dead in the water.
@@ -56,17 +54,18 @@ Most media servers depend heavily on BitTorrent protocols:
 - If your system crashes or restarts mid-torrent, files frequently recheck or get corrupted.
 
 ### How I do it differently:
-- **Zero Seeder Dependency:** My downloads **never** rely on seeders, peers, or torrent swarms. As long as the provider is online, you download at maximum CDN wire speeds.
-- **Unstoppable Auto-Resume:** You can pause, turn off your PC, restart your computer, or lose your Wi-Fi connection completely  -  my downloader picks up right at the exact byte it left off from. Nothing gets corrupted.
-- **Smart Chunk Architecture:** How do I bypass stream throttling and pack clean MP4s with embedded subtitles automatically? That's my secret sauce  -  **look through the source code in this repo** if you want to see how my download engine works under the hood.
+- **Zero Seeder Dependency:** My downloads **never** rely on seeders, peers, or torrent swarms. Mine will never go down unless the provider itself goes down.
+- **Unstoppable Auto-Resume:** You can pause, turn off your PC, restart your computer, or lose your internet connection completely - my downloader immediately picks up right at the exact byte it left off from. Nothing gets corrupted.
+- **Smart Chunk Architecture:** How do I bypass stream throttling and pack clean MP4s with embedded subtitles automatically? That is my secret sauce - **look through the source code in this repo** if you want to see how my download engine works under the hood.
 - **Self-Contained & Lightweight:** No complex local Docker daemons, external database services, or complex ports to forward. Just double-click and run.
 
-### Seanime Issues I Specifically Fixed:
-- ❌ **HLS Buffer Holes & Stream Stalls** (#953): My HLS player uses an adaptive pre-buffering pipeline with seamless quality fallback.
-- ❌ **Subtitle Desync & Disappearing Tracks** (#940, #919, #881): Subtitles are extracted and rendered directly in my custom player pipeline.
-- ❌ **External Player Freezes on Long Streams** (#879): My native player runs entirely within the app window with hardware acceleration, skipping the need for flaky external MPV/VLC links.
-- ❌ **Manga Cache Loss After Restart** (#905): All downloaded manga chapters save directly as standard `.cbz` files with `ComicInfo.xml` metadata in permanent disk folders.
-- ❌ **Player Closes Between Episodes** (#902): Full autoplay progression queue  -  the next episode loads smoothly without closing your player window.
+### Issues I Specifically Solved in My App:
+- **HLS Buffer Holes & Stream Stalls** (#953, #847): My HLS player uses an adaptive pre-buffering pipeline with seamless quality fallback so playback never stutters.
+- **Subtitle Desync & Disappearing Tracks** (#940, #919, #881): Subtitles are extracted and rendered directly in my custom player pipeline.
+- **Downloads Stuck at 0 KB/s** (#957, #912): No waiting for peers or dead torrents; chunks download at maximum CDN wire speed.
+- **Manga Cache Loss After Restart** (#905, #641): All downloaded manga chapters save directly as standard `.cbz` files with `ComicInfo.xml` metadata in permanent disk folders.
+- **Player Closes Between Episodes** (#902): Full autoplay progression queue - the next episode loads smoothly without closing your player window.
+- **Border Scroll Bugs in Manga Reader** (#903, #918): Fully optimized smooth keyboard navigation and infinite scroll.
 
 ---
 
@@ -104,16 +103,16 @@ Grab the latest build from my official release:
 
 <p align="center">
 <a href="https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime" style="font-size:18px;">
-<b>Download PlayzAnime v0.1.0 for Windows →</b>
+<b>Download PlayzAnime v0.1.0 for Windows -></b>
 </a>
 </p>
 
 1. Download **`PlayzAnime-Setup-0.1.0.exe`** (Installer) or **`PlayzAnime-Portable-0.1.0.exe`** (Single Portable Binary).
-2. If Windows SmartScreen displays a warning for unsigned software: click **More info** → **Run anyway**.
+2. If Windows SmartScreen displays a warning for unsigned software: click **More info** -> **Run anyway**.
 3. Launch the app. First-run configuration takes under a minute.
 
 > [!TIP]
-> **Controlled Folder Access Warning:** If Windows Defender Ransomware Protection is enabled, it may block writes to Desktop/Documents. Choose **Allow PlayzAnime** during setup or in **Settings → Downloads**, or run `resources\tools\allow-folder-access.bat` from the installation directory.
+> **Controlled Folder Access Warning:** If Windows Defender Ransomware Protection is enabled, it may block writes to Desktop/Documents. Choose **Allow PlayzAnime** during setup or in **Settings -> Downloads**, or run `resources\tools\allow-folder-access.bat` from the installation directory.
 
 ---
 
@@ -124,7 +123,7 @@ Grab the latest build from my official release:
 | `Ctrl K` or `/` | Search anime and manga |
 | `Space` or `K` | Play / Pause |
 | `J` / `L` | Seek backward / forward 10 seconds |
-| `←` / `→` | Seek backward / forward 5 seconds |
+| `<-` / `->` | Seek backward / forward 5 seconds |
 | `N` / `P` | Next / Previous episode |
 | `S` | Skip intro / outro |
 | `C` | Cycle subtitles |
