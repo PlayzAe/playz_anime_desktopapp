@@ -1,8 +1,43 @@
 node_modules/
 out/
+dist/
 release/
 *.log
 build/.icon-render.html
 
 # seanime is downloaded here as a design reference only (GPL-3.0). Never ship or commit it.
 reference/
+
+# Environment & IDE
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.vs/
+*.suo
+*.user
+
+# Downloaded files & temporary caches
+*.mp4
+*.cbz
+*.zip
+downloads/
+userData/
+*.tmp
+*.temp
+
+# Scratch & scripts
+*.py
+*.ps1
+__pycache__/
+*.pyc
+scripts/temp*
+scripts/fix*
+scripts/update*
+test-results/
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store

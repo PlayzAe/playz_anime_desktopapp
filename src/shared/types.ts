@@ -175,11 +175,12 @@ export interface ResolvedStream {
 
 // ── Manga ───────────────────────────────────────────────────────────────────
 
-export type MangaProviderId = 'mangadex' | 'weebcentral' | 'flame' | 'mangapill';
+export type MangaProviderId = 'mangadex' | 'asura' | 'weebcentral' | 'flame' | 'mangapill';
 
 /** Every chapter source, in the order they're shown. */
 export const MANGA_PROVIDERS: { id: MangaProviderId; name: string; note: string }[] = [
   { id: 'mangadex', name: 'MangaDex', note: 'Community scanlations with chapter titles and groups' },
+  { id: 'asura', name: 'Asura Scans', note: 'Top scanlation source for Korean manhwa and action series' },
   { id: 'weebcentral', name: 'WeebCentral', note: 'Large catalogue, strong on manhwa and manhua' },
   { id: 'flame', name: 'Flame Comics', note: 'New Korean manhwa, often the only English source' },
   { id: 'mangapill', name: 'MangaPill', note: 'Fast, popular manga; a good fallback' },

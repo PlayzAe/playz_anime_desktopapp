@@ -1,7 +1,6 @@
 import { parse } from 'node-html-parser';
 import type { Chapter, ChapterPage } from '../../shared/types';
 import { getText, retry } from '../http';
-import { registerRefererHosts } from '../network';
 import { decodeEntities } from './anikoto';
 import { plainQuery } from './weebcentral';
 
@@ -96,6 +95,7 @@ export async function chapters(path: string): Promise<Chapter[]> {
   return list.reverse();
 }
 
+/** Page image URLs; the image CDN refuses requests without the site's Referer, so the RPC layer proxies them. */
 export async function pages(chapterPath: string): Promise<ChapterPage[]> {
   const html = await retry(() => getText(`${BASE}${chapterPath}`, { timeoutMs: 15000 }));
   const root = parse(html);
@@ -104,8 +104,7 @@ export async function pages(chapterPath: string): Promise<ChapterPage[]> {
     width: Number(img.getAttribute('width')) || null,
     height: Number(img.getAttribute('height')) || null,
   }));
-  const valid = result.filter((p) => /^https?:\/\//.test(p.url));
-  // The image CDN refuses requests without the site's Referer.
-  registerRefererHosts(valid.map((p) => p.url), MANGAPILL_REFERER);
-  return valid;
+  return result.filter((p) => /^https?:\/\//.test(p.url));
 }
+
+export const ping = () => search('naruto');

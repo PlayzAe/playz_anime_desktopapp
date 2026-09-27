@@ -3,6 +3,7 @@ import { MANGA_PROVIDERS } from '../shared/types';
 import * as anilist from './anilist';
 import { TtlCache } from './cache';
 import { logger } from './log';
+import * as asura from './sources/asura';
 import * as flame from './sources/flame';
 import * as mangadex from './sources/mangadex';
 import * as mangapill from './sources/mangapill';
@@ -42,6 +43,16 @@ const SOURCES: Record<MangaProviderId, Source> = {
     chapters: (id) => mangadex.chapters(id),
     pages: (id, saver) => mangadex.pages(id, saver),
     ping: () => mangadex.ping(),
+  },
+  asura: {
+    find: async (media) => {
+      const hit = await asura.match(titlesFor(media), media.startDate?.year ?? null);
+      return hit ? { sourceId: hit.id, title: hit.title } : null;
+    },
+    chapters: (id) => asura.chapters(id),
+    pages: (id) => asura.pages(id),
+    ping: () => asura.ping(),
+    referer: asura.ASURA_REFERER,
   },
   weebcentral: {
     find: async (media) => {
@@ -156,7 +167,7 @@ async function loadProvider(provider: MangaProviderId, media: MediaDetail, force
 }
 
 const readable = (r: ProviderResult) => r.chapters.filter((c) => !c.externalUrl).length;
-const RICHNESS: Record<MangaProviderId, number> = { mangadex: 3, flame: 2, weebcentral: 1, mangapill: 0 };
+const RICHNESS: Record<MangaProviderId, number> = { mangadex: 4, asura: 3, flame: 2, weebcentral: 1, mangapill: 0 };
 
 /**
  * Asks every healthy source in parallel and uses the one that is furthest along
