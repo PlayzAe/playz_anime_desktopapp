@@ -144,6 +144,11 @@ function SourceSwitcherDialog({ open, onClose, list, onSelect }: SourceSwitcherP
 
   const currentProviderId = list.provider ?? discovered[0]?.provider;
 
+  const handlePick = (p: MangaProviderId) => {
+    onSelect(p);
+    onClose();
+  };
+
   return (
     <Modal open={open} onClose={onClose} title="Reading Sources & Extensions" width={680}>
       <div className="source-modal-container">
@@ -179,7 +184,13 @@ function SourceSwitcherDialog({ open, onClose, list, onSelect }: SourceSwitcherP
                 <div
                   key={p.provider}
                   className={`source-card ${isActive ? 'is-active' : ''}`}
-                  onClick={() => onSelect(p.provider)}
+                  onClick={() => handlePick(p.provider)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handlePick(p.provider);
+                    }
+                  }}
                   role="button"
                   tabIndex={0}
                 >
@@ -221,7 +232,13 @@ function SourceSwitcherDialog({ open, onClose, list, onSelect }: SourceSwitcherP
                   <div
                     key={p.id}
                     className="source-card"
-                    onClick={() => onSelect(p.id)}
+                    onClick={() => handlePick(p.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handlePick(p.id);
+                      }
+                    }}
                     role="button"
                     tabIndex={0}
                   >
@@ -242,7 +259,13 @@ function SourceSwitcherDialog({ open, onClose, list, onSelect }: SourceSwitcherP
                   <div
                     key={ext.id}
                     className="source-card"
-                    onClick={() => onSelect(ext.id as MangaProviderId)}
+                    onClick={() => handlePick(ext.id as MangaProviderId)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handlePick(ext.id as MangaProviderId);
+                      }
+                    }}
                     role="button"
                     tabIndex={0}
                   >
@@ -452,6 +475,15 @@ function ChapterPanel({ media, snap, list, read, setRead, currentId, onProvider,
       )}
 
       <ChapterDownloadDialog open={dialog} onClose={() => setDialog(false)} media={snap} chapters={list.chapters} unread={unread} />
+      <SourceSwitcherDialog
+        open={sourceDialog}
+        onClose={() => setSourceDialog(false)}
+        list={list}
+        onSelect={(p) => {
+          onProvider(p);
+          setSourceDialog(false);
+        }}
+      />
     </div>
   );
 }

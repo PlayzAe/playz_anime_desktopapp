@@ -210,7 +210,15 @@ export async function chapterList(mediaId: number, provider?: MangaProviderId | 
     providersToCheck.push(preferred);
   }
   const results = await Promise.all(providersToCheck.map((id) => loadProvider(id, media, force)));
-  let chosen = preferred ? results.find((r) => r.summary.provider === preferred && readable(r)) : undefined;
+  let chosen: ProviderResult | undefined;
+  if (provider) {
+    // User explicitly chose this provider in the UI: always respect their choice
+    chosen = results.find((r) => r.summary.provider === provider);
+  } else if (store().settings.mangaProvider !== 'auto') {
+    // Global user preference: use if it has readable chapters
+    chosen = results.find((r) => r.summary.provider === store().settings.mangaProvider && readable(r) > 0);
+  }
+
   if (!chosen) {
     chosen = [...results].sort((a, b) => {
       const diff = Number(b.summary.latest ?? -1) - Number(a.summary.latest ?? -1);
@@ -221,7 +229,7 @@ export async function chapterList(mediaId: number, provider?: MangaProviderId | 
 
   return {
     mediaId,
-    provider: chosen && chosen.chapters.length ? chosen.summary.provider : null,
+    provider: chosen ? chosen.summary.provider : null,
     chapters: chosen?.chapters ?? [],
     providers: results.map((r) => r.summary),
   };
