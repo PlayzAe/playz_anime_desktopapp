@@ -1,4 +1,4 @@
-import type { Chapter, ChapterPage, MediaDetail } from '../../../src/shared/types';
+import type { Chapter, ChapterPage, MediaDetail } from '../../../shared/types';
 import type { MangaExtensionConfig, MangaExtensionSource } from '../types';
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';

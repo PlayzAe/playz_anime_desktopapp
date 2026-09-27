@@ -1,17 +1,16 @@
-import { useState, type ReactNode } from 'react';
-import { MANGA_PROVIDERS, type AccentKey, type ProviderHealth, type Settings as SettingsT } from '../../shared/types';
+import { useEffect, useState, type ReactNode } from 'react';
+import { MANGA_PROVIDERS, type AccentKey, type MangaExtensionInfo, type ProviderHealth, type Settings as SettingsT } from '../../shared/types';
 import { Button, Segmented, Select, Switch } from '../components/Controls';
-import { Icon } from '../components/Icon';
+import { Icon, type IconName } from '../components/Icon';
 import { Logo } from '../components/Logo';
 import { Modal } from '../components/Modal';
 import { useLoader } from '../lib/data';
+import { CHANGELOG_URL, DOCS_URL, GITHUB_URL, POLICIES_URL, RELEASES_URL } from '../lib/links';
 import { useApp } from '../lib/store';
 import './settings.css';
 
 const api = () => window.playzanime;
-
-// The policies live on the PlayzAnime website; until it has its own domain, the GitHub page links there.
-const LEGAL_URL = 'https://github.com/PlayzAe/playz_anime/blob/main/LEGAL.md';
+const open = (url: string) => void api().app.openExternal(url);
 
 const ACCENTS: { key: AccentKey; name: string; kanji: string; color: string }[] = [
   { key: 'shu', name: 'Shu', kanji: '朱', color: '#f0532c' },
@@ -41,11 +40,27 @@ const SHORTCUTS: [string, string][] = [
   ['F11', 'Full-screen window'],
 ];
 
+const SECTIONS: { id: string; title: string }[] = [
+  { id: 'look', title: 'Look' },
+  { id: 'watching', title: 'Watching' },
+  { id: 'reading', title: 'Reading' },
+  { id: 'sources', title: 'Sources' },
+  { id: 'downloads', title: 'Downloads' },
+  { id: 'privacy', title: 'Network & privacy' },
+  { id: 'data', title: 'Your data' },
+  { id: 'keyboard', title: 'Keyboard' },
+  { id: 'help', title: 'Help' },
+  { id: 'about', title: 'About' },
+];
+
 export function Settings() {
   const { settings, updateSettings, toast, clearAllHistory } = useApp();
   const info = useLoader('appinfo', () => api().app.info(), Infinity);
   const [confirm, setConfirm] = useState(false);
   const set = <K extends keyof SettingsT>(key: K, value: SettingsT[K]) => void updateSettings({ [key]: value } as Partial<SettingsT>);
+  // Until app info arrives, desktop-only rows wait rather than flash in and out on the web.
+  const web = info.data ? info.data.platform === 'web' : null;
+  const desktop = web === false;
 
   const chooseDir = async (kind: 'anime' | 'manga') => {
     const next = await api().settings.chooseDir(kind);
@@ -59,333 +74,275 @@ export function Settings() {
         <p className="page-sub">Changes save as you make them.</p>
       </div>
 
-      <div className="settings-body">
-        <Group title="Look">
-          <Row title="Accent" note="Used for the play button and progress bars. Named after traditional Japanese colours.">
-            <div className="swatches" role="radiogroup" aria-label="Accent colour">
-              {ACCENTS.map((a) => (
-                <button
-                  key={a.key}
-                  type="button"
-                  role="radio"
-                  aria-checked={settings.accent === a.key}
-                  className={`swatch ${settings.accent === a.key ? 'is-on' : ''}`}
-                  onClick={() => set('accent', a.key)}
-                  title={a.name}
-                >
-                  <span className="swatch-color" style={{ background: a.color }} />
-                  <span className="swatch-kanji jp">{a.kanji}</span>
-                  <span className="swatch-name">{a.name}</span>
-                </button>
+      <div className="settings-layout">
+        <SectionIndex />
+
+        <div className="settings-body">
+          <Group id="look" title="Look">
+            <Row title="Accent" note="Used for the play button and progress bars. Named after traditional Japanese colours.">
+              <div className="swatches" role="radiogroup" aria-label="Accent colour">
+                {ACCENTS.map((a) => (
+                  <button
+                    key={a.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={settings.accent === a.key}
+                    className={`swatch ${settings.accent === a.key ? 'is-on' : ''}`}
+                    onClick={() => set('accent', a.key)}
+                    title={a.name}
+                  >
+                    <span className="swatch-color" style={{ background: a.color }} />
+                    <span className="swatch-kanji jp">{a.kanji}</span>
+                    <span className="swatch-name">{a.name}</span>
+                  </button>
+                ))}
+              </div>
+            </Row>
+            <Row title="Titles" note="Which name to show first.">
+              <Segmented
+                label="Title language"
+                value={settings.titleLanguage}
+                onChange={(v) => set('titleLanguage', v)}
+                options={[
+                  { value: 'english', label: 'English' },
+                  { value: 'romaji', label: 'Romaji' },
+                ]}
+              />
+            </Row>
+            <Row title="Japanese titles" note="Show the original title set vertically beside the artwork.">
+              <Switch checked={settings.showNativeTitles} onChange={(v) => set('showNativeTitles', v)} label="Show Japanese titles" />
+            </Row>
+          </Group>
+
+          <Group id="watching" title="Watching">
+            <Row title="Player" note="PlayzAnime’s player has keyboard shortcuts, skip intro and no ads. The embed player is the source’s own, kept as a fallback.">
+              <Segmented
+                label="Default player"
+                value={settings.player}
+                onChange={(v) => set('player', v)}
+                options={[
+                  { value: 'direct', label: 'PlayzAnime' },
+                  { value: 'embed', label: 'Embed' },
+                ]}
+              />
+            </Row>
+            <Row title="Prefer English dub" note="Starts dubbed when a dub exists.">
+              <Switch checked={settings.preferDub} onChange={(v) => set('preferDub', v)} label="Prefer English dub" />
+            </Row>
+            <Row title="Subtitle language" note="Picked automatically when the source has it.">
+              <Select label="Subtitle language" value={settings.subtitleLanguage} onChange={(v) => set('subtitleLanguage', v)} options={LANGUAGES} width={180} />
+            </Row>
+            <Row title="Autoplay next episode" note="Counts down while the credits roll.">
+              <Switch checked={settings.autoplayNext} onChange={(v) => set('autoplayNext', v)} label="Autoplay next episode" />
+            </Row>
+            <Row title="Skip intros automatically" note="Only for episodes where the source marks the opening.">
+              <Switch checked={settings.autoSkipIntro} onChange={(v) => set('autoSkipIntro', v)} label="Skip intros automatically" />
+            </Row>
+          </Group>
+
+          <Group id="reading" title="Reading">
+            <Row title="Reading mode" note="Press M in the reader to switch.">
+              <Segmented
+                label="Reading mode"
+                value={settings.readerMode}
+                onChange={(v) => set('readerMode', v)}
+                options={[
+                  { value: 'vertical', label: 'Scroll' },
+                  { value: 'paged', label: 'Pages' },
+                ]}
+              />
+            </Row>
+            <Row title="Page direction" note="For page mode. Japanese manga reads right to left.">
+              <Segmented
+                label="Page direction"
+                value={settings.readerDirection}
+                onChange={(v) => set('readerDirection', v)}
+                options={[
+                  { value: 'rtl', label: 'Right to left' },
+                  { value: 'ltr', label: 'Left to right' },
+                ]}
+              />
+            </Row>
+          </Group>
+
+          <Group id="sources" title="Sources" note="Where chapters come from. Titles and artwork always come from AniList.">
+            <Row title="Manga source" note="Auto checks every source for each title and reads from the one that’s furthest along, skipping any that are down.">
+              <Select
+                label="Manga source"
+                value={settings.mangaProvider}
+                onChange={(v) => set('mangaProvider', v)}
+                width={180}
+                options={[{ value: 'auto', label: 'Auto (recommended)' }, ...MANGA_PROVIDERS.map((p) => ({ value: p.id, label: p.name }))]}
+              />
+            </Row>
+            <SourceHealth web={web === true} />
+            <ExtensionsManager web={web === true} />
+          </Group>
+
+          <Group id="downloads" title="Downloads">
+            {web && (
+              <Row title="Downloads are in the Windows app" note="Saving episodes (MP4) and chapters (CBZ) for offline needs a real disk. Here in the browser you stream and read.">
+                <Button variant="primary" size="sm" icon="downloads" onClick={() => open(RELEASES_URL)}>
+                  Get the Windows app
+                </Button>
+              </Row>
+            )}
+            {desktop && (
+              <>
+                <Row title="Anime folder" note={<span className="settings-path">{settings.animeDir}</span>}>
+                  <div className="row-buttons">
+                    <Button variant="quiet" size="sm" icon="folder" onClick={() => void api().app.openDir('anime')}>
+                      Open
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => void chooseDir('anime')}>
+                      Change
+                    </Button>
+                  </div>
+                </Row>
+                <Row title="Manga folder" note={<span className="settings-path">{settings.mangaDir}</span>}>
+                  <div className="row-buttons">
+                    <Button variant="quiet" size="sm" icon="folder" onClick={() => void api().app.openDir('manga')}>
+                      Open
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => void chooseDir('manga')}>
+                      Change
+                    </Button>
+                  </div>
+                </Row>
+                <FolderGuardRow />
+                <Row title="Episode quality" note="Used for new downloads. Lower quality saves disk space.">
+                  <Select
+                    label="Episode quality"
+                    value={settings.quality}
+                    onChange={(v) => set('quality', v)}
+                    width={180}
+                    options={[
+                      { value: 'best', label: 'Best available' },
+                      { value: '1080', label: 'Up to 1080p' },
+                      { value: '720', label: 'Up to 720p' },
+                      { value: '480', label: 'Up to 480p' },
+                    ]}
+                  />
+                </Row>
+                <Row title="Notify when finished" note="A Windows notification when the queue empties.">
+                  <Switch checked={settings.notifyDownloads} onChange={(v) => set('notifyDownloads', v)} label="Notify when downloads finish" />
+                </Row>
+              </>
+            )}
+          </Group>
+
+          <Group id="privacy" title="Network & privacy">
+            <Row title="Data saver" note="For hotspots and capped plans: smaller video buffers, 720p at most, no pre-loading of the next episode, and compressed manga pages where the source offers them.">
+              <Switch checked={settings.dataSaver} onChange={(v) => set('dataSaver', v)} label="Data saver" />
+            </Row>
+            {desktop && (
+              <Row title="Block ads and pop-ups" note="Filters ad and tracker requests inside embedded players. Pop-up windows are always blocked.">
+                <Switch checked={settings.adblock} onChange={(v) => set('adblock', v)} label="Block ads" />
+              </Row>
+            )}
+            <Row title="Hide adult titles" note="Leaves 18+ entries out of every list and search.">
+              <Switch checked={settings.hideAdult} onChange={(v) => set('hideAdult', v)} label="Hide adult titles" />
+            </Row>
+          </Group>
+
+          <Group id="data" title="Your data" note={web ? 'Everything is kept in this browser. Nothing is sent to an account.' : 'Everything is kept on this PC. There are no accounts.'}>
+            <Row title="Clear cached lists" note="Forces fresh data from AniList and the sources on next load.">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  void api()
+                    .app.clearCache()
+                    .then(() => toast('Cache cleared'))
+                }
+              >
+                Clear cache
+              </Button>
+            </Row>
+            <Row title="Watch and reading history" note="Resume points, watched episodes and read chapters. Library lists stay.">
+              <Button variant="ghost" size="sm" icon="trash" onClick={() => setConfirm(true)}>
+                Clear history
+              </Button>
+            </Row>
+          </Group>
+
+          <Group id="keyboard" title="Keyboard">
+            <dl className="shortcuts">
+              {SHORTCUTS.map(([keys, what]) => (
+                <div key={keys} className="shortcut">
+                  <dt>
+                    {keys.split(/\s{2}/).map((k, i) =>
+                      ['or', '/'].includes(k) ? (
+                        <span key={i} className="faint">
+                          {' '}
+                          {k}{' '}
+                        </span>
+                      ) : (
+                        <kbd key={i}>{k}</kbd>
+                      ),
+                    )}
+                  </dt>
+                  <dd>{what}</dd>
+                </div>
               ))}
+            </dl>
+          </Group>
+
+          <Group id="help" title="Help">
+            <div className="link-list">
+              <LinkRow icon="info" title="Guides and FAQ" note="How watching, reading, sources and downloads work." url={DOCS_URL} />
+              <LinkRow icon="bolt" title="What’s new" note="Release notes for every version." url={CHANGELOG_URL} />
+              {web && <LinkRow icon="downloads" title="PlayzAnime for Windows" note="Downloads, offline mode and every source, free." url={RELEASES_URL} />}
+              <LinkRow icon="shield" title="Terms, privacy and copyright" note="What PlayzAnime is, what it keeps, and how to send a DMCA notice." url={POLICIES_URL} />
+              <LinkRow icon="layers" title="Source code" note="The Windows app, the web app and the website, on GitHub." url={GITHUB_URL} />
             </div>
-          </Row>
-          <Row title="Titles" note="Which name to show first.">
-            <Segmented
-              label="Title language"
-              value={settings.titleLanguage}
-              onChange={(v) => set('titleLanguage', v)}
-              options={[
-                { value: 'english', label: 'English' },
-                { value: 'romaji', label: 'Romaji' },
-              ]}
-            />
-          </Row>
-          <Row title="Japanese titles" note="Show the original title set vertically beside the artwork.">
-            <Switch checked={settings.showNativeTitles} onChange={(v) => set('showNativeTitles', v)} label="Show Japanese titles" />
-          </Row>
-        </Group>
+          </Group>
 
-        <Group title="Watching">
-          <Row title="Player" note="PlayzAnime’s player has keyboard shortcuts, skip intro and no ads. The embed player is the source’s own, kept as a fallback.">
-            <Segmented
-              label="Default player"
-              value={settings.player}
-              onChange={(v) => set('player', v)}
-              options={[
-                { value: 'direct', label: 'PlayzAnime' },
-                { value: 'embed', label: 'Embed' },
-              ]}
-            />
-          </Row>
-          <Row title="Prefer English dub" note="Starts dubbed when a dub exists.">
-            <Switch checked={settings.preferDub} onChange={(v) => set('preferDub', v)} label="Prefer English dub" />
-          </Row>
-          <Row title="Subtitle language" note="Picked automatically when the source has it.">
-            <Select label="Subtitle language" value={settings.subtitleLanguage} onChange={(v) => set('subtitleLanguage', v)} options={LANGUAGES} width={180} />
-          </Row>
-          <Row title="Autoplay next episode" note="Counts down while the credits roll.">
-            <Switch checked={settings.autoplayNext} onChange={(v) => set('autoplayNext', v)} label="Autoplay next episode" />
-          </Row>
-          <Row title="Skip intros automatically" note="Only for episodes where the source marks the opening.">
-            <Switch checked={settings.autoSkipIntro} onChange={(v) => set('autoSkipIntro', v)} label="Skip intros automatically" />
-          </Row>
-        </Group>
-
-        <Group title="Reading">
-          <Row title="Reading mode" note="Press M in the reader to switch.">
-            <Segmented
-              label="Reading mode"
-              value={settings.readerMode}
-              onChange={(v) => set('readerMode', v)}
-              options={[
-                { value: 'vertical', label: 'Scroll' },
-                { value: 'paged', label: 'Pages' },
-              ]}
-            />
-          </Row>
-          <Row title="Page direction" note="For page mode. Japanese manga reads right to left.">
-            <Segmented
-              label="Page direction"
-              value={settings.readerDirection}
-              onChange={(v) => set('readerDirection', v)}
-              options={[
-                { value: 'rtl', label: 'Right to left' },
-                { value: 'ltr', label: 'Left to right' },
-              ]}
-            />
-          </Row>
-          <Row title="Manga source" note="Auto checks every source for each title and reads from the one that’s furthest along, skipping any that are down.">
-            <Segmented
-              label="Manga source"
-              value={settings.mangaProvider}
-              onChange={(v) => set('mangaProvider', v)}
-              options={[{ value: 'auto', label: 'Auto' }, ...MANGA_PROVIDERS.map((p) => ({ value: p.id, label: p.name, title: p.note }))]}
-            />
-          </Row>
-          <SourceHealth />
-        </Group>
-
-        <Group title="Manga & Manhwa Extensions (55 Sources)">
-          <ExtensionsManager />
-        </Group>
-
-        <Group title="Downloads">
-          <Row title="Anime folder" note={settings.animeDir}>
-            <div className="row-buttons">
-              <Button variant="quiet" size="sm" icon="folder" onClick={() => void api().app.openDir('anime')}>
-                Open
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => void chooseDir('anime')}>
-                Change
-              </Button>
-            </div>
-          </Row>
-          <Row title="Manga folder" note={settings.mangaDir}>
-            <div className="row-buttons">
-              <Button variant="quiet" size="sm" icon="folder" onClick={() => void api().app.openDir('manga')}>
-                Open
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => void chooseDir('manga')}>
-                Change
-              </Button>
-            </div>
-          </Row>
-          <FolderGuardRow />
-          <Row title="Episode quality" note="Used for new downloads. Lower quality saves disk space.">
-            <Select
-              label="Episode quality"
-              value={settings.quality}
-              onChange={(v) => set('quality', v)}
-              width={180}
-              options={[
-                { value: 'best', label: 'Best available' },
-                { value: '1080', label: 'Up to 1080p' },
-                { value: '720', label: 'Up to 720p' },
-                { value: '480', label: 'Up to 480p' },
-              ]}
-            />
-          </Row>
-          <Row title="Notify when finished" note="A Windows notification when the queue empties.">
-            <Switch checked={settings.notifyDownloads} onChange={(v) => set('notifyDownloads', v)} label="Notify when downloads finish" />
-          </Row>
-        </Group>
-
-        <Group title="Network & privacy">
-          <Row title="Data saver" note="For hotspots and capped plans: smaller video buffers, 720p at most, no pre-loading of the next episode, and compressed manga pages where the source offers them.">
-            <Switch checked={settings.dataSaver} onChange={(v) => set('dataSaver', v)} label="Data saver" />
-          </Row>
-          <Row title="Block ads and pop-ups" note="Filters ad and tracker requests inside embedded players. Pop-up windows are always blocked.">
-            <Switch checked={settings.adblock} onChange={(v) => set('adblock', v)} label="Block ads" />
-          </Row>
-          <Row title="Hide adult titles" note="Leaves 18+ entries out of every list and search.">
-            <Switch checked={settings.hideAdult} onChange={(v) => set('hideAdult', v)} label="Hide adult titles" />
-          </Row>
-        </Group>
-
-        <Group title="Your data">
-          <Row title="Clear cached lists" note="Forces fresh data from AniList and the sources on next load.">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                void api()
-                  .app.clearCache()
-                  .then(() => toast('Cache cleared'))
-              }
-            >
-              Clear cache
-            </Button>
-          </Row>
-          <Row title="Watch and reading history" note="Resume points, watched episodes and read chapters. Library lists stay.">
-            <Button variant="ghost" size="sm" onClick={() => setConfirm(true)}>
-              Clear history
-            </Button>
-          </Row>
-        </Group>
-
-        <Group title="Keyboard">
-          <dl className="shortcuts">
-            {SHORTCUTS.map(([keys, what]) => (
-              <div key={keys} className="shortcut">
-                <dt>
-                  {keys.split(/\s{2}/).map((k, i) =>
-                    ['or', '/'].includes(k) ? (
-                      <span key={i} className="faint">
-                        {' '}
-                        {k}{' '}
-                      </span>
-                    ) : (
-                      <kbd key={i}>{k}</kbd>
-                    ),
-                  )}
-                </dt>
-                <dd>{what}</dd>
-              </div>
-            ))}
-          </dl>
-        </Group>
-
-        <Group title="Support">
-          <div className="support">
-            <p>
-              PlayzAnime is free, has no ads and never will. If it earns a place on your desktop, a star or a follow on GitHub keeps it going.
-            </p>
-            <Button variant="primary" icon="heart" onClick={() => void api().app.openExternal('https://github.com/PlayzAe')}>
-              github.com/PlayzAe
-            </Button>
-          </div>
-        </Group>
-
-        <Group title="Documentation & Architecture">
-          <div className="doc-links-grid">
-            <div className="doc-link-card">
-              <div className="doc-link-header">
-                <Icon name="layers" size={16} />
-                <strong>Multi-Source Engine Architecture</strong>
-              </div>
-              <p>
-                Learn how PlayzAnime indexes 55+ Mihon & Tachiyomi scanlation extensions, automatically detects Cloudflare WAF blocks, and dynamically switches sources.
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon="external"
-                onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime#multi-source-engine--extensions')}
-              >
-                Read Engine Docs
-              </Button>
-            </div>
-
-            <div className="doc-link-card">
-              <div className="doc-link-header">
-                <Icon name="shield" size={16} />
-                <strong>Legal, Terms & Privacy Policy</strong>
-              </div>
-              <p>
-                Compliance details, DMCA takedown procedure, zero-log privacy policy, and open-source license information.
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon="external"
-                onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime/blob/main/LEGAL.md')}
-              >
-                View Legal Document
-              </Button>
-            </div>
-
-            <div className="doc-link-card">
-              <div className="doc-link-header">
-                <Icon name="tv" size={16} />
-                <strong>Direct Player & HLS Relay Protocol</strong>
-              </div>
-              <p>
-                Technical overview of our stream resolver, in-player subtitle customizer, and low-latency proxy design.
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon="external"
-                onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime/blob/main/CONTRACT.md')}
-              >
-                API & Stream Contract
-              </Button>
-            </div>
-
-            <div className="doc-link-card">
-              <div className="doc-link-header">
-                <Icon name="code" size={16} />
-                <strong>Official GitHub Repositories</strong>
-              </div>
-              <p>
-                Source code repositories for Desktop Electron app releases, Web server hosting, and Landing page.
-              </p>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <Button
-                  variant="quiet"
-                  size="sm"
-                  onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime_desktopapp')}
-                >
-                  Desktop Repo
-                </Button>
-                <Button
-                  variant="quiet"
-                  size="sm"
-                  onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime')}
-                >
-                  Web Repo
-                </Button>
-                <Button
-                  variant="quiet"
-                  size="sm"
-                  onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime_landingpage')}
-                >
-                  Landing Repo
-                </Button>
-              </div>
-            </div>
-          </div>
-        </Group>
-
-        <Group title="About">
-          <div className="about">
-            <Logo size={56} />
-            <div>
-              <p className="about-name">PlayzAnime {info.data?.version}</p>
-              <p className="faint num">
-                Electron {info.data?.electron} · Chromium {info.data?.chrome?.split('.')[0]}
-              </p>
-              <p className="about-credits">
-                Titles, artwork and schedules come from AniList. Chapters come from MangaDex, WeebCentral, Flame Comics and MangaPill, and episodes from third-party hosts. PlayzAnime
-                doesn’t host, upload or store any video or pages; its server only forwards requests as they happen. It isn’t affiliated with any source, studio, publisher or streaming
-                service.
-              </p>
-              <p className="about-credits">
-                By using PlayzAnime you agree to its{' '}
-                <a href={LEGAL_URL} target="_blank" rel="noopener noreferrer">
-                  terms, copyright policy and privacy policy
-                </a>
-                .
-              </p>
-              {info.data && (
-                <p className="faint about-data" title={info.data.userData}>
-                  Settings and history live in {info.data.userData}
+          <Group id="about" title="About">
+            <div className="about">
+              <Logo size={56} />
+              <div className="about-text">
+                <p className="about-name">PlayzAnime {web ? 'on the web' : info.data?.version}</p>
+                {desktop && info.data && (
+                  <p className="faint num">
+                    Electron {info.data.electron} · Chromium {info.data.chrome.split('.')[0]}
+                  </p>
+                )}
+                <p className="about-credits">
+                  Titles, artwork and schedules come from AniList. Chapters come from MangaDex, Asura Scans, WeebCentral, Flame Comics, MangaPill and community sources, and episodes
+                  from third-party hosts. PlayzAnime doesn’t host, upload or store any video or pages
+                  {web ? '; its server only forwards requests as they happen' : ''}. It isn’t affiliated with any source, studio, publisher or streaming service.
                 </p>
-              )}
+                <p className="about-credits">
+                  By using PlayzAnime you agree to its{' '}
+                  <a
+                    href={POLICIES_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      open(POLICIES_URL);
+                    }}
+                  >
+                    terms, copyright policy and privacy policy
+                  </a>
+                  .
+                </p>
+                {desktop && info.data?.userData && (
+                  <p className="faint about-data" title={info.data.userData}>
+                    Settings and history live in <span className="settings-path">{info.data.userData}</span>
+                  </p>
+                )}
+                <div className="about-support">
+                  <p>Free, with no ads, and it stays that way. If it earns a place on your {web ? 'bookmarks bar' : 'desktop'}, a star on GitHub keeps it going.</p>
+                  <Button variant="ghost" size="sm" icon="heart" onClick={() => open(GITHUB_URL)}>
+                    Star on GitHub
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        </Group>
+          </Group>
+        </div>
       </div>
 
       <Modal
@@ -414,6 +371,44 @@ export function Settings() {
         <p className="muted">Resume points, watched episodes and read chapters are removed. Your library lists and downloaded files stay.</p>
       </Modal>
     </div>
+  );
+}
+
+/** The list of sections down the side; the one being read is highlighted. */
+function SectionIndex() {
+  const [active, setActive] = useState(SECTIONS[0].id);
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        const top = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (top) setActive(top.target.id);
+      },
+      { rootMargin: '-15% 0px -70% 0px' },
+    );
+    SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, []);
+  return (
+    <nav className="settings-index" aria-label="Settings sections">
+      {SECTIONS.map((s) => (
+        <a
+          key={s.id}
+          href={`#${s.id}`}
+          className={s.id === active ? 'is-active' : undefined}
+          aria-current={s.id === active ? 'true' : undefined}
+          onClick={(e) => {
+            e.preventDefault();
+            setActive(s.id);
+            document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          {s.title}
+        </a>
+      ))}
+    </nav>
   );
 }
 
@@ -462,165 +457,186 @@ function FolderGuardRow() {
   );
 }
 
-/** Which chapter sources answer right now, and how quickly. */
-function SourceHealth() {
+/** Which built-in chapter sources answer right now, and how quickly. */
+function SourceHealth({ web }: { web: boolean }) {
   const [force, setForce] = useState(0);
   const health = useLoader(`manga-health:${force}`, () => api().manga.health(force > 0), 60_000);
   const byId = new Map<string, ProviderHealth>((health.data ?? []).map((h) => [h.provider, h]));
-  return (
-    <div className="sources">
-      {MANGA_PROVIDERS.map((p) => {
-        const h = byId.get(p.id);
-        const state = !h ? 'checking' : h.ok ? (h.ms > 4000 ? 'slow' : 'up') : 'down';
-        const isCloudflare = h?.error?.includes('403');
-        const stateLabel =
-          state === 'checking'
-            ? 'Checking…'
-            : state === 'down'
-              ? isCloudflare
-                ? 'Blocked (Cloudflare 403)'
-                : 'Unreachable'
-              : `${(h!.ms / 1000).toFixed(1)} s`;
-        const stateTitle = isCloudflare
-          ? 'Cloudflare WAF blocked this datacenter hosting IP (Render/AWS). Keep Manga source on Auto for automatic fallback, or use the Desktop App for direct access.'
-          : (h?.error ?? undefined);
+  const blocked = MANGA_PROVIDERS.filter((p) => byId.get(p.id)?.error?.includes('403'));
 
-        return (
-          <div key={p.id} className={`source is-${state}`}>
-            <span className="source-dot" aria-hidden="true" />
-            <span className="source-name">{p.name}</span>
-            <span className="source-note">{p.note}</span>
-            <span className="source-state num" title={stateTitle}>
-              {stateLabel}
-            </span>
-          </div>
-        );
-      })}
-      <div className="sources-cloud-notice">
-        <span className="sources-cloud-notice-title">Web Hosting & Source Availability:</span>
-        Cloudflare blocks datacenter hosting IPs (e.g. Render, AWS) for certain sources (WeebCentral, Flame) with HTTP 403.
-        In <strong>Auto</strong> mode, PlayzAnime automatically skips blocked sources and serves all manhwa and manga through healthy providers (Asura Scans, MangaDex, MangaPill). For 100% direct access to all 5 sources without cloud blocks, use the <strong>PlayzAnime Desktop App</strong>.
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <div className="panel-title">
+          <strong>Built-in sources</strong>
+          <span>Checked every few minutes. Auto skips any that are down.</span>
+        </div>
+        <Button variant="quiet" size="sm" icon="refresh" onClick={() => setForce((n) => n + 1)} disabled={health.loading}>
+          Check again
+        </Button>
       </div>
-      <button type="button" className="sources-recheck" onClick={() => setForce((n) => n + 1)}>
-        <Icon name="refresh" size={14} /> Check again
-      </button>
+      <ul className="sources">
+        {MANGA_PROVIDERS.map((p) => {
+          const h = byId.get(p.id);
+          const state = !h ? 'checking' : h.ok ? (h.ms > 4000 ? 'slow' : 'up') : h.error?.includes('403') ? 'blocked' : 'down';
+          const label = { checking: 'Checking…', up: `${((h?.ms ?? 0) / 1000).toFixed(1)} s`, slow: `Slow · ${((h?.ms ?? 0) / 1000).toFixed(1)} s`, blocked: 'Blocked here', down: 'Down' }[state];
+          return (
+            <li key={p.id} className={`source is-${state}`}>
+              <span className="source-dot" aria-hidden="true" />
+              <span className="source-text">
+                <span className="source-name">{p.name}</span>
+                <span className="source-note">{p.note}</span>
+              </span>
+              <span className="source-state num" title={h?.error ?? undefined}>
+                {label}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      {blocked.length > 0 && (
+        <div className="callout" role="note">
+          <Icon name="alert" size={17} />
+          <div>
+            <p>
+              <strong>{blocked.map((b) => b.name).join(' and ')}</strong> {blocked.length > 1 ? 'turn' : 'turns'} away {web ? 'cloud servers like the one this site runs on' : 'this connection'}.{' '}
+              {web
+                ? 'Auto reads from the other sources instead. The Windows app connects from your own PC, so it reaches every source.'
+                : 'Auto reads from the other sources instead. A VPN or another network usually gets through.'}
+            </p>
+            {web && (
+              <Button variant="ghost" size="sm" icon="downloads" onClick={() => open(RELEASES_URL)}>
+                Get the Windows app
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-/** Mihon / Tachiyomi style Extensions Manager for 55+ manga and manhwa sources. */
-function ExtensionsManager() {
-  const [filter, setFilter] = useState<'all' | 'manhwa' | 'manga' | 'manhua' | 'webtoon'>('all');
+const CATEGORIES = ['all', 'manhwa', 'manga', 'manhua', 'webtoon'] as const;
+const PREVIEW = 12;
+
+/** The community sources (Mihon / Tachiyomi style), each one on or off. */
+function ExtensionsManager({ web }: { web: boolean }) {
+  const [filter, setFilter] = useState<(typeof CATEGORIES)[number]>('all');
   const [query, setQuery] = useState('');
+  const [all, setAll] = useState(false);
   const [tick, setTick] = useState(0);
-  const extensionsLoader = useLoader(`manga-extensions:${tick}`, () => api().manga.extensions?.() ?? Promise.resolve([]), 5 * 60_000);
-  const items = extensionsLoader.data ?? [];
+  const loader = useLoader(`manga-extensions:${tick}`, () => api().manga.extensions?.() ?? Promise.resolve([] as MangaExtensionInfo[]), 5 * 60_000);
+  const items = loader.data ?? [];
+  if (!items.length) return null;
 
-  const filtered = items.filter((ext) => {
-    if (filter !== 'all' && ext.category !== filter) return false;
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      return ext.name.toLowerCase().includes(q) || ext.note.toLowerCase().includes(q) || ext.engine.toLowerCase().includes(q);
-    }
-    return true;
-  });
+  const q = query.trim().toLowerCase();
+  const matches = items.filter(
+    (ext) => (filter === 'all' || ext.category === filter) && (!q || `${ext.name} ${ext.note} ${ext.engine}`.toLowerCase().includes(q)),
+  );
+  const shown = all || q || filter !== 'all' ? matches : matches.slice(0, PREVIEW);
+  const on = items.filter((x) => x.enabled).length;
 
-  const toggle = async (id: string, currentState: boolean) => {
-    await api().manga.toggleExtension?.(id, !currentState);
+  const toggle = async (ext: MangaExtensionInfo) => {
+    await api().manga.toggleExtension?.(ext.id, !ext.enabled);
     setTick((t) => t + 1);
   };
 
   return (
-    <div className="extensions-manager">
-      <div className="extensions-hero-banner">
-        <div className="extensions-hero-header">
-          <div className="extensions-hero-title">
-            <span className="extensions-pulse-dot" />
-            <h4>Multi-Source Engine (Tachiyomi / Mihon Core)</h4>
-          </div>
-          <span className="extensions-hero-count">
-            {items.filter((x) => x.enabled).length} of {items.length} Active
+    <div className="panel">
+      <div className="panel-head">
+        <div className="panel-title">
+          <strong>Community sources</strong>
+          <span>
+            Scanlation groups and aggregators, asked alongside the built-in ones. Turn off any you don’t want. On a series page, <em>Source</em> switches between them.
           </span>
         </div>
-        <p className="extensions-hero-desc">
-          Extensions automatically scrape and serve chapters from scanlation groups and aggregator sources. Toggle any provider below to control what is active.
-        </p>
-        <div className="extensions-steps">
-          <div className="extensions-step-card">
-            <div className="step-num">01</div>
-            <div className="step-content">
-              <strong>Enable Sources</strong>
-              <span>Toggle providers below. Active extensions are instantly queried.</span>
-            </div>
-          </div>
-          <div className="extensions-step-card">
-            <div className="step-num">02</div>
-            <div className="step-content">
-              <strong>Smart Auto-Pick</strong>
-              <span>Automatically picks the source with the highest chapter count.</span>
-            </div>
-          </div>
-          <div className="extensions-step-card">
-            <div className="step-num">03</div>
-            <div className="step-content">
-              <strong>Switch On The Fly</strong>
-              <span>On any manga or manhwa page, click <em>Source</em> to switch scanlators.</span>
-            </div>
-          </div>
-        </div>
+        <span className="panel-count num">
+          {on} of {items.length} on
+        </span>
       </div>
 
-      <div className="extensions-toolbar">
-        <input
-          type="search"
-          className="extensions-search"
-          placeholder="Filter 55 sources (e.g. Asura, Reaper, Bato, Toonily)..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+      <div className="ext-toolbar">
+        <label className="ext-search">
+          <Icon name="search" size={15} />
+          <input type="search" placeholder={`Filter ${items.length} sources`} value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Filter sources" />
+        </label>
+        <Segmented
+          size="sm"
+          label="Kind"
+          value={filter}
+          onChange={setFilter}
+          options={CATEGORIES.map((c) => ({ value: c, label: c === 'all' ? 'All' : c[0].toUpperCase() + c.slice(1) }))}
         />
-        <div className="extensions-tabs">
-          {(['all', 'manhwa', 'manga', 'manhua', 'webtoon'] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              className={`extensions-tab ${filter === tab ? 'is-active' : ''}`}
-              onClick={() => setFilter(tab)}
-            >
-              {tab.toUpperCase()}
-            </button>
-          ))}
-        </div>
       </div>
 
-      <div className="extensions-grid">
-        {filtered.map((ext) => (
-          <div key={ext.id} className={`extension-card ${ext.enabled ? 'is-enabled' : 'is-disabled'}`}>
-            <div className="extension-card-header">
-              <span className="extension-card-name">{ext.name}</span>
-              <span className={`extension-badge engine-${ext.engine}`}>{ext.engine}</span>
-            </div>
-            <p className="extension-card-note">{ext.note}</p>
-            <div className="extension-card-footer">
-              <span className="extension-badge category">{ext.category}</span>
-              <button
-                type="button"
-                className={`extension-toggle-btn ${ext.enabled ? 'is-on' : 'is-off'}`}
-                onClick={() => void toggle(ext.id, ext.enabled)}
-              >
-                {ext.enabled ? 'Active' : 'Disabled'}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {shown.length === 0 ? (
+        <p className="ext-empty">No source matches “{query}”.</p>
+      ) : (
+        <ul className="ext-list">
+          {shown.map((ext) => {
+            const unavailable = web && ext.desktopOnly;
+            return (
+              <li key={ext.id} className={`ext ${ext.enabled ? '' : 'is-off'}`}>
+                <span className="ext-text">
+                  <span className="ext-name">
+                    {ext.name}
+                    <span className="ext-tag">{ext.category}</span>
+                    {unavailable && <span className="ext-tag is-warn">Windows app</span>}
+                  </span>
+                  <span className="ext-note" title={ext.note}>
+                    {ext.note}
+                  </span>
+                </span>
+                <Switch checked={ext.enabled} onChange={() => void toggle(ext)} label={`${ext.name} source`} />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {!q && filter === 'all' && matches.length > PREVIEW && (
+        <button type="button" className="ext-more" onClick={() => setAll((a) => !a)}>
+          {all ? 'Show fewer' : `Show all ${matches.length}`}
+          <Icon name="chevronDown" size={15} className={all ? 'is-flipped' : undefined} />
+        </button>
+      )}
     </div>
   );
 }
 
-function Group({ title, children }: { title: string; children: ReactNode }) {
+function LinkRow({ icon, title, note, url }: { icon: IconName; title: string; note: string; url: string }) {
   return (
-    <section className="settings-group">
-      <h2 className="settings-group-title">{title}</h2>
+    <a
+      className="link-row"
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => {
+        e.preventDefault();
+        open(url);
+      }}
+    >
+      <span className="link-row-icon">
+        <Icon name={icon} size={17} />
+      </span>
+      <span className="link-row-text">
+        <span className="link-row-title">{title}</span>
+        <span className="link-row-note">{note}</span>
+      </span>
+      <Icon name="external" size={15} className="link-row-go" />
+    </a>
+  );
+}
+
+function Group({ id, title, note, children }: { id: string; title: string; note?: string; children: ReactNode }) {
+  return (
+    <section id={id} className="settings-group" aria-labelledby={`${id}-title`}>
+      <div className="settings-group-head">
+        <h2 id={`${id}-title`} className="settings-group-title">
+          {title}
+        </h2>
+        {note && <p className="settings-group-note">{note}</p>}
+      </div>
       <div className="settings-rows">{children}</div>
     </section>
   );

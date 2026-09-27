@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { MANGA_PROVIDERS, providerName, type Chapter, type ChapterList, type MangaProviderId, type MediaDetail, type MediaSnapshot } from '../../shared/types';
-import { Button, IconButton, Menu, Segmented, Tabs } from '../components/Controls';
+import { Button, IconButton, Menu, Tabs } from '../components/Controls';
 import { DetailFacts, DetailHeader, DetailSkeleton, RecommendedGrid, RelatedGrid } from '../components/Detail';
 import { ChapterDownloadDialog } from '../components/DownloadDialogs';
 import { Icon } from '../components/Icon';
@@ -335,7 +335,7 @@ function ChapterPanel({ media, snap, list, read, setRead, currentId, onProvider,
               <Button icon="refresh" onClick={onRefresh}>
                 Check again
               </Button>
-              <Button variant="secondary" icon="layers" onClick={() => setSourceDialog(true)}>
+              <Button variant="ghost" icon="layers" onClick={() => setSourceDialog(true)}>
                 Switch Source / Extensions (55)
               </Button>
             </div>

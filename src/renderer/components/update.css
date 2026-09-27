@@ -1,162 +1,84 @@
-/* ── 21st.dev Style Update Notification Toast ── */
+/* A new release, announced in the corner. Sits above the mini player and toasts. */
 .update-toast {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999;
-  width: 340px;
-  border-radius: 14px;
-  background: rgba(18, 18, 20, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  overflow: hidden;
-}
-
-.update-toast-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
-}
-
-.update-toast-content {
-  padding: 16px 18px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  width: min(340px, calc(100vw - 32px));
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 14px 16px 16px;
+  border-radius: var(--radius-3);
+  border: 1px solid var(--line-2);
+  border-top: 2px solid var(--accent);
+  background: var(--ink-2);
+  box-shadow:
+    0 18px 48px rgb(0 0 0 / 0.5),
+    0 0 0 1px rgb(0 0 0 / 0.3);
 }
-
-.update-toast-header {
+.update-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
-
-.update-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
+.update-eyebrow {
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 720;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #6ee7b7;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  padding: 3px 9px;
-  border-radius: 9999px;
+  color: var(--accent-hi, var(--accent));
 }
-
-.update-pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: updatePulse 1.8s infinite ease-in-out;
-}
-
-@keyframes updatePulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-.update-close-btn {
-  background: transparent;
-  border: 0;
-  color: var(--paper-3);
-  cursor: pointer;
-  padding: 4px;
+.update-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-}
-
-.update-close-btn:hover {
-  color: var(--paper);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.update-title {
-  font-size: 13.5px;
-  color: var(--paper);
-  line-height: 1.4;
-}
-
-.update-title strong {
-  color: #fff;
-  font-weight: 700;
-}
-
-.update-highlights {
-  margin: 0;
-  padding-left: 16px;
-  font-size: 12px;
-  color: var(--paper-2);
-  line-height: 1.45;
-}
-
-.update-highlights li {
-  margin-bottom: 2px;
-}
-
-.update-body {
-  margin: 0;
-  font-size: 12px;
+  width: 26px;
+  height: 26px;
+  margin: -4px -6px -4px 0;
+  border-radius: var(--radius-1);
   color: var(--paper-3);
-  line-height: 1.4;
+  transition:
+    color var(--fast) var(--ease),
+    background var(--fast) var(--ease);
 }
-
+.update-close:hover {
+  color: var(--paper);
+  background: var(--ink-3);
+}
+.update-title {
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.35;
+  color: var(--paper);
+}
+.update-version {
+  font-weight: 760;
+}
+.update-points {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 16px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--paper-2);
+}
+.update-points li::marker {
+  color: var(--paper-4);
+}
 .update-actions {
   display: flex;
-  align-items: center;
   gap: 8px;
   margin-top: 4px;
 }
 
-.update-download-btn {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: #10b981;
-  color: #052e16;
-  font-size: 12.5px;
-  font-weight: 650;
-  border: 0;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.update-download-btn:hover {
-  background: #34d399;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-}
-
-.update-later-btn {
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--paper-2);
-  font-size: 12.5px;
-  font-weight: 550;
-  border: 1px solid var(--line-2);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.update-later-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--paper);
+@media (max-width: 600px) {
+  .update-toast {
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    width: auto;
+  }
 }

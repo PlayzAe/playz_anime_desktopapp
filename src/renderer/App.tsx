@@ -79,32 +79,7 @@ const ONLINE_ONLY: Route['name'][] = ['home', 'mangaHome', 'discover', 'schedule
 
 export function App() {
   const route = useRoute();
-  const { settings, online, toast } = useApp();
-  // Dynamically update the desktop app and taskbar icon when the user switches accents
-  useEffect(() => {
-    if (!window.playzanime?.app?.setAppIcon) return;
-    const accentColors: Record<string, string> = {
-      shu: '#f0532c',
-      matcha: '#9dbb5c',
-      ai: '#6f8fe6',
-      yamabuki: '#f5a623',
-      sakura: '#f28baf',
-    };
-    const color = accentColors[settings.accent] ?? '#f0532c';
-    const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const img = new Image();
-    const svg = <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="9" fill="$color"/><path d="M40 8.5H51A4.5 4.5 0 0 1 55.5 13V44" fill="none" stroke="#f6efe4" stroke-width="2.4"/><path d="M55.5 49V51A4.5 4.5 0 0 1 51 55.5H22" fill="none" stroke="#f6efe4" stroke-width="2.4"/><path d="M16 55.5H13A4.5 4.5 0 0 1 8.5 51V13A4.5 4.5 0 0 1 13 8.5H35" fill="none" stroke="#f6efe4" stroke-width="2.4"/><path d="M17 14H35A12.5 12.5 0 0 1 35 39H27V48L17 51ZM27 20.5V32.5L38.5 26.5Z" fill="#f6efe4" fill-rule="evenodd"/></svg>;
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0);
-      const dataUrl = canvas.toDataURL('image/png');
-      void window.playzanime.app.setAppIcon?.(dataUrl);
-    };
-  }, [settings.accent]);
+  const { online, toast } = useApp();
   const mainRef = useRef<HTMLElement>(null);
   const scrollMemory = useRef(new Map<number, number>());
   const [scrolled, setScrolled] = useState(false);

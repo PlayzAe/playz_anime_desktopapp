@@ -1,4 +1,4 @@
-import type { Chapter, ChapterPage, MediaDetail } from '../../src/shared/types';
+import type { Chapter, ChapterPage, MediaDetail } from '../../shared/types';
 
 export type ExtensionEngine = 'madara' | 'mangastream' | 'mangabox' | 'custom';
 export type ExtensionCategory = 'manhwa' | 'manga' | 'manhua' | 'webtoon';

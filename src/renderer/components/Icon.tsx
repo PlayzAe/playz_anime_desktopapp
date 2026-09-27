@@ -286,7 +286,6 @@ const glyphs = {
       {S('M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7.5 14.5h9')}
     </>
   ),
-  chevronDown: S('M6 9l6 6 6-6'),
   layers: (
     <>
       {S('M12 2 2 7l10 5 10-5z')}

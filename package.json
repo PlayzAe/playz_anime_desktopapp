@@ -1,7 +1,7 @@
 {
   "name": "playzanime",
   "productName": "PlayzAnime",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "PlayzAnime: watch and download anime, read and download manga.",
   "private": true,
   "main": "out/main/index.cjs",
@@ -23,6 +23,7 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
+    "@ghostery/adblocker-electron": "^2.18.2",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -33,14 +34,11 @@
     "ffmpeg-static": "^5.3.0",
     "hls.js": "^1.7.3",
     "motion": "^13.4.3",
+    "node-html-parser": "^9.0.4",
     "playwright-core": "^1.63.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.1"
-  },
-  "dependencies": {
-    "@ghostery/adblocker-electron": "^2.18.2",
-    "node-html-parser": "^9.0.4"
   }
 }

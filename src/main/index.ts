@@ -1,9 +1,10 @@
-import { app, BrowserWindow, dialog, Menu, nativeImage, type NativeImage, net, protocol, screen, session, type WebContents } from 'electron';
+import { app, BrowserWindow, dialog, Menu, net, protocol, screen, session, type WebContents } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { AppCommand } from '../shared/api';
 import { downloader } from './downloader';
+import { accentIcon } from './appIcon';
 import { applySettingsSideEffects, registerIpc } from './ipc';
 import { logger } from './log';
 import { installNetworkRules } from './network';
@@ -28,7 +29,8 @@ protocol.registerSchemesAsPrivileged([
   { scheme: MEDIA_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } },
 ]);
 
-app.setAppUserModelId('com.playzanime.desktop');
+// Dev runs get their own id, so they can't claim the installed app's taskbar icon.
+app.setAppUserModelId(app.isPackaged ? 'com.playzanime.desktop' : 'com.playzanime.desktop.dev');
 
 // The portable build keeps settings and history beside the exe, so the whole app
 // travels on a USB stick. PLAYZANIME_USER_DATA lets tests use a throwaway profile.
@@ -180,28 +182,6 @@ function harden(contents: WebContents) {
 
 function createWindow() {
   const state = store().windowState;
-  let initialIcon: NativeImage | undefined;
-  const candidateIconPaths = [
-    path.join(__dirname, '../../build/icon.ico'),
-    path.join(__dirname, '../../build/icon.png'),
-    path.join(app.getAppPath(), 'build/icon.ico'),
-    path.join(app.getAppPath(), 'build/icon.png'),
-    path.join(process.resourcesPath, 'build/icon.ico'),
-    path.join(process.resourcesPath, 'build/icon.png'),
-  ];
-  for (const p of candidateIconPaths) {
-    try {
-      if (fs.existsSync(p)) {
-        const buf = fs.readFileSync(p);
-        const img = nativeImage.createFromBuffer(buf);
-        if (!img.isEmpty()) {
-          initialIcon = img;
-          break;
-        }
-      }
-    } catch {}
-  }
-
   const win = new BrowserWindow({
     ...safeBounds(state),
     minWidth: 1024,
@@ -209,7 +189,7 @@ function createWindow() {
     show: false,
     backgroundColor: INK,
     title: 'PlayzAnime',
-    icon: initialIcon,
+    icon: accentIcon(store().settings.accent),
     titleBarStyle: 'hidden',
     titleBarOverlay:
       process.platform === 'darwin' ? undefined : { color: INK, symbolColor: '#e9e3da', height: TITLEBAR_HEIGHT },

@@ -1,144 +1,137 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
+import { CHANGELOG_URL, DESKTOP_REPO } from '../lib/links';
+import { Button } from './Controls';
 import { Icon } from './Icon';
 import './update.css';
 
+/*
+ * A new Windows release, announced once. In the Windows app it means "update available";
+ * on the web it tells visitors the app has something new. Release notes are written on
+ * GitHub, so there's nothing to change here when one comes out.
+ */
+
 interface GithubRelease {
   tag_name: string;
-  name: string;
-  body: string;
+  name: string | null;
+  body: string | null;
   html_url: string;
-  published_at: string;
 }
 
-const GITHUB_REPO = 'PlayzAe/playz_anime_desktopapp';
 const DISMISSED_KEY = 'playzanime:dismissed_update';
 
-function compareVersions(remote: string, current: string): boolean {
+/** True when `remote` is a higher version than `current` (both like v1.2.3). */
+function isNewer(remote: string, current: string): boolean {
   const r = remote.replace(/^v/i, '').split('.').map((n) => parseInt(n, 10) || 0);
   const c = current.replace(/^v/i, '').split('.').map((n) => parseInt(n, 10) || 0);
-
   for (let i = 0; i < Math.max(r.length, c.length); i++) {
-    const rv = r[i] ?? 0;
-    const cv = c[i] ?? 0;
-    if (rv > cv) return true;
-    if (rv < cv) return false;
+    if ((r[i] ?? 0) !== (c[i] ?? 0)) return (r[i] ?? 0) > (c[i] ?? 0);
   }
   return false;
 }
 
+/** The first couple of top-level points from the notes, as plain text. */
+function highlights(body: string, count = 2): string[] {
+  const plain = (s: string) =>
+    s
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[*_`]+/g, '')
+      .replace(/:$/, '')
+      .trim();
+  const lines = body.split(/\r?\n/);
+  const bullets = lines.filter((l) => /^[-*•]\s+/.test(l)).map((l) => plain(l.replace(/^[-*•]\s+/, '')));
+  const pick = bullets.length ? bullets : lines.filter((l) => l.trim() && !/^\s*#/.test(l)).map(plain);
+  return pick.filter(Boolean).slice(0, count);
+}
+
 export function UpdateNotifier({ ready }: { ready: boolean }) {
   const [update, setUpdate] = useState<GithubRelease | null>(null);
+  const [web, setWeb] = useState(false);
   const [closed, setClosed] = useState(false);
 
   useEffect(() => {
     if (!ready) return;
-
-    // Wait 2.5 seconds after splash/animation completes
+    // Give the intro and the first screen a moment before saying anything.
     const timer = setTimeout(async () => {
       try {
-        const info = await window.playzanime.app.info().catch(() => ({ version: '1.1.0' }));
-        const currentVersion = info?.version || '1.1.0';
-
-        // Completely unauthenticated public GitHub REST API - NO KEYS REQUIRED
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
-          headers: {
-            Accept: 'application/vnd.github.v3+json',
-            'User-Agent': 'PlayzAnime-Client',
-          },
-        });
-
+        const info = await window.playzanime.app.info();
+        const res = await fetch(`https://api.github.com/repos/${DESKTOP_REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } });
         if (!res.ok) return;
-        const data = (await res.json()) as GithubRelease;
-        if (!data?.tag_name) return;
-
-        const dismissed = localStorage.getItem(DISMISSED_KEY);
-        if (dismissed === data.tag_name) return;
-
-        const isNewer = compareVersions(data.tag_name, currentVersion);
-        if (isNewer) {
-          setUpdate(data);
+        const latest = (await res.json()) as GithubRelease;
+        if (!latest?.tag_name) return;
+        try {
+          if (localStorage.getItem(DISMISSED_KEY) === latest.tag_name) return;
+        } catch {
+          /* storage unavailable */
+        }
+        const onWeb = info.platform === 'web';
+        // The web app has no version of its own to compare, so it announces each release once.
+        if (onWeb || isNewer(latest.tag_name, info.version)) {
+          setWeb(onWeb);
+          setUpdate(latest);
         }
       } catch {
-        // Silently skip if offline or rate limited
+        // Offline or rate-limited: try again next launch.
       }
     }, 2500);
-
     return () => clearTimeout(timer);
   }, [ready]);
 
-  const handleDismiss = () => {
-    if (update) {
-      try {
-        localStorage.setItem(DISMISSED_KEY, update.tag_name);
-      } catch {}
+  const dismiss = () => {
+    try {
+      if (update) localStorage.setItem(DISMISSED_KEY, update.tag_name);
+    } catch {
+      /* storage unavailable */
     }
     setClosed(true);
   };
 
-  const handleOpen = () => {
-    if (update) {
-      void window.playzanime.app.openExternal(update.html_url);
-      handleDismiss();
-    }
+  const go = (url: string) => {
+    void window.playzanime.app.openExternal(url);
+    dismiss();
   };
 
-  if (!update || closed) return null;
-
-  // Clean first couple lines of changelog
-  const summaryLines = (update.body || '')
-    .split('\n')
-    .map((s) => s.trim())
-    .filter((s) => s && !s.startsWith('#'))
-    .slice(0, 2);
+  const points = update ? highlights(update.body ?? '') : [];
 
   return (
     <AnimatePresence>
-      <motion.div
-        className="update-toast"
-        role="alert"
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20, scale: 0.95 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div className="update-toast-glow" />
-        <div className="update-toast-content">
-          <div className="update-toast-header">
-            <div className="update-badge">
-              <span className="update-pulse-dot" />
-              <span>Yoo, new update is out!</span>
-            </div>
-            <button type="button" className="update-close-btn" onClick={handleDismiss} title="Dismiss">
-              <Icon name="close" size={14} />
+      {update && !closed && (
+        <motion.aside
+          className="update-toast"
+          role="status"
+          aria-label={web ? 'New Windows release' : 'Update available'}
+          initial={{ opacity: 0, y: 24, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.97 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="update-head">
+            <span className="update-eyebrow">{web ? 'New for Windows' : 'Update available'}</span>
+            <button type="button" className="update-close" onClick={dismiss} aria-label="Dismiss">
+              <Icon name="close" size={15} />
             </button>
           </div>
-
-          <div className="update-title">
-            PlayzAnime <strong>{update.tag_name}</strong> is available
-          </div>
-
-          {summaryLines.length > 0 ? (
-            <ul className="update-highlights">
-              {summaryLines.map((line, i) => (
-                <li key={i}>{line.replace(/^[-*•]\s*/, '')}</li>
+          <p className="update-title">
+            PlayzAnime <span className="update-version num">{update.tag_name}</span> {web ? 'is out' : 'is ready to download'}
+          </p>
+          {points.length > 0 && (
+            <ul className="update-points">
+              {points.map((p) => (
+                <li key={p}>{p}</li>
               ))}
             </ul>
-          ) : (
-            <p className="update-body">New features, performance enhancements, and source fixes are ready.</p>
           )}
-
           <div className="update-actions">
-            <button type="button" className="update-download-btn" onClick={handleOpen}>
-              <Icon name="downloads" size={14} />
-              <span>Download Latest Release</span>
-            </button>
-            <button type="button" className="update-later-btn" onClick={handleDismiss}>
-              Later
-            </button>
+            <Button variant="primary" size="sm" icon="downloads" onClick={() => go(update.html_url)}>
+              {web ? 'Get the Windows app' : 'Download'}
+            </Button>
+            <Button variant="quiet" size="sm" onClick={() => go(CHANGELOG_URL)}>
+              What’s new
+            </Button>
           </div>
-        </div>
-      </motion.div>
+        </motion.aside>
+      )}
     </AnimatePresence>
   );
 }

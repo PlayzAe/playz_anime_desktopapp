@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button, Segmented } from '../components/Controls';
 import { Modal } from '../components/Modal';
 import './subtitle-customizer.css';

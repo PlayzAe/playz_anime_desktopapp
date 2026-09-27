@@ -20,10 +20,15 @@ electronLanguages:
 files:
   - out/**/*
   - build/icon.png
+  # The window and taskbar icon follows the accent picked in Settings.
+  - build/icon-*.png
   - package.json
   - '!out/probe/**'
+  - '!out/selftest/**'
 asar: true
 compression: maximum
+# Drops Chromium files the app never loads (WebGPU compiler, software Vulkan). See the script.
+afterPack: scripts/after-pack.cjs
 
 # The Controlled-folder-access helper ships next to the app, in resources\tools.
 extraResources:

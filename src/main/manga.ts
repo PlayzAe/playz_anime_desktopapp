@@ -1,7 +1,8 @@
-import type { Chapter, ChapterList, ChapterPage, MangaProviderId, MediaDetail, ProviderHealth, ProviderSummary } from '../shared/types';
+import type { Chapter, ChapterList, ChapterPage, MangaExtensionInfo, MangaProviderId, MediaDetail, ProviderHealth, ProviderSummary } from '../shared/types';
 import { MANGA_PROVIDERS } from '../shared/types';
 import * as anilist from './anilist';
 import { TtlCache } from './cache';
+import { extensionRegistry } from './extensions/registry';
 import { logger } from './log';
 import * as asura from './sources/asura';
 import * as flame from './sources/flame';
@@ -87,8 +88,6 @@ const SOURCES: Record<MangaProviderId, Source> = {
   },
 };
 
-import { extensionRegistry } from './extensions/registry';
-import type { MangaExtensionInfo } from '../shared/types';
 
 export function getSource(provider: MangaProviderId): Source | undefined {
   if (SOURCES[provider]) return SOURCES[provider];
