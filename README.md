@@ -51,6 +51,21 @@ PlayzAnime is a **streaming platform** and **media client** with a **web app** a
 
 ---
 
+## Screenshots
+
+<p align="center"><img src="docs/screenshots/home.png" alt="PlayzAnime home screen" width="100%"/></p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/manga.png" alt="Manga, manhwa and manhua"/><br/><sub>Manga, manhwa and manhua from many sources</sub></td>
+    <td width="50%"><img src="docs/screenshots/downloads.png" alt="Downloads"/><br/><sub>Downloads: episodes as MP4, chapters as CBZ</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/profiles.png" alt="Profiles"/><br/><sub>Profiles you can share with friends</sub></td>
+    <td width="50%"><img src="docs/screenshots/settings.png" alt="Settings"/><br/><sub>Settings, with five accent colours</sub></td>
+  </tr>
+</table>
+
 ## Features
 
 - **Native Custom Player:** Powered by `hls.js` with adaptive bitrate streaming (1080p, 720p, 480p, 360p), full keyboard shortcuts, smooth volume controls, and picture-in-picture.

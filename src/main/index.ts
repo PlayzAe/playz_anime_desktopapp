@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { AppCommand } from '../shared/api';
 import { downloader } from './downloader';
-import { accentIcon } from './appIcon';
+import { accentIcon, APP_ID, applyAccentIcon } from './appIcon';
 import { applySettingsSideEffects, registerIpc } from './ipc';
 import { logger } from './log';
 import { installNetworkRules } from './network';
@@ -29,8 +29,7 @@ protocol.registerSchemesAsPrivileged([
   { scheme: MEDIA_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } },
 ]);
 
-// Dev runs get their own id, so they can't claim the installed app's taskbar icon.
-app.setAppUserModelId(app.isPackaged ? 'com.playzanime.desktop' : 'com.playzanime.desktop.dev');
+app.setAppUserModelId(APP_ID);
 
 // The portable build keeps settings and history beside the exe, so the whole app
 // travels on a USB stick. PLAYZANIME_USER_DATA lets tests use a throwaway profile.
@@ -203,6 +202,7 @@ function createWindow() {
       autoplayPolicy: 'no-user-gesture-required',
     },
   });
+  applyAccentIcon(store().settings.accent, [win]);
   mainWindow = win;
   win.setMenuBarVisibility(false);
   harden(win.webContents);

@@ -77,7 +77,7 @@ const chapterJob = (media, number) => {
   const dir = join(files, 'PlayzManga', series);
   fs.mkdirSync(dir, { recursive: true });
   const zip = join(dir, `${series}_Ch${String(number).padStart(3, '0')}.zip`);
-  execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', `Compress-Archive -Path '${pageDir}\\*' -DestinationPath '${zip}' -Force`], { stdio: ['ignore', 'pipe', 'pipe'] });
+  execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', `Compress-Archive -Path '${pageDir}\\*' -DestinationPath '${zip.replaceAll("'", "''")}' -Force`], { stdio: ['ignore', 'pipe', 'pipe'] });
   const file = zip.replace(/\.zip$/, '.cbz');
   fs.renameSync(zip, file);
   jobs.push({
@@ -121,7 +121,7 @@ const data = {
   read: {},
   downloads: jobs,
   window: { width: 1440, height: 900, maximized: false },
-  setupDone: false,
+  setupDone: true,
   profile: { id: 'demo-rin', name: 'Rin', avatar: null, tagline: 'Seinen first, then whatever’s airing.', favorites: [...anime.slice(0, 4), ...manga.slice(0, 2)], createdAt: now },
   imported: [
     { format: 'playzanime-profile', version: 1, exportedAt: now - 2 * H, importedAt: now - H, profile: { id: 'demo-aki', name: 'Aki', avatar: null, tagline: 'Manhwa at 2am, romance on Sundays.', favorites: [...manga.slice(4, 8), ...anime.slice(9, 11)], createdAt: now }, ...friendLists(8) },
@@ -144,13 +144,8 @@ const shot = async (name) => {
   console.log('saved', name);
 };
 
-// First run: the one-time setup screen.
-await win.waitForSelector('.ring', { timeout: 20_000 });
-await win.waitForTimeout(700);
-await shot('setup');
-await win.evaluate(() => window.playzanime.setup.complete());
-await win.reload();
-await win.waitForTimeout(1500);
+// The intro plays on every launch; let it finish.
+await win.waitForTimeout(4500);
 
 const routes = [
   ['home', '/', 3500],
