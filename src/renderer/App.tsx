@@ -4,6 +4,7 @@ import { Button } from './components/Controls';
 import { ProfileDrop } from './components/ProfileDrop';
 import { Rail, TitleBar, Toasts } from './components/Shell';
 import { Splash } from './components/Splash';
+import { UpdateNotifier } from './components/UpdateNotifier';
 import { EmptyState } from './components/States';
 import { goBack, goForward, navigate, useRoute, type Route } from './lib/router';
 import { useApp } from './lib/store';
@@ -164,6 +165,7 @@ export function App() {
       <ProfileDrop />
       {!splash && setupDone === false && <FirstRun onDone={() => setSetupDone(true)} />}
       {splash && <Splash irisToRail={setupDone !== false} onDone={() => setSplash(false)} />}
+      <UpdateNotifier ready={!splash} />
       <Toasts />
     </div>
   );

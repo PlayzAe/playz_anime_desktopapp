@@ -86,8 +86,34 @@ const SOURCES: Record<MangaProviderId, Source> = {
   },
 };
 
+import { extensionRegistry } from './extensions/registry';
+import type { MangaExtensionInfo } from '../shared/types';
+
+export function getSource(provider: MangaProviderId): Source | undefined {
+  if (SOURCES[provider]) return SOURCES[provider];
+  const ext = extensionRegistry.getSource(provider);
+  if (ext) {
+    return {
+      find: (media) => ext.find(media, true),
+      chapters: (id) => ext.chapters(id),
+      pages: (id) => ext.pages(id),
+      ping: () => ext.ping(),
+      referer: ext.config.baseUrl,
+    };
+  }
+  return undefined;
+}
+
+export function listExtensions(): MangaExtensionInfo[] {
+  return extensionRegistry.getAllConfigs() as MangaExtensionInfo[];
+}
+
+export function toggleExtension(id: string, enabled: boolean) {
+  extensionRegistry.toggle(id, enabled);
+}
+
 export function refererFor(provider: MangaProviderId): string | undefined {
-  return SOURCES[provider]?.referer;
+  return getSource(provider)?.referer;
 }
 
 // ── Health ──────────────────────────────────────────────────────────────────
@@ -98,7 +124,7 @@ const HEALTH_TTL = 10 * MIN;
 async function check(provider: MangaProviderId): Promise<ProviderHealth> {
   const started = Date.now();
   try {
-    await Promise.race([SOURCES[provider].ping(), new Promise((_, reject) => setTimeout(() => reject(new Error('No answer in 10 seconds')), 10_000))]);
+    const src = getSource(provider); if (!src) throw new Error("Source not found"); await Promise.race([src.ping(), new Promise((_, reject) => setTimeout(() => reject(new Error('No answer in 10 seconds')), 10_000))]);
     return { provider, ok: true, ms: Date.now() - started, checkedAt: Date.now(), error: null };
   } catch (err) {
     return { provider, ok: false, ms: Date.now() - started, checkedAt: Date.now(), error: err instanceof Error ? err.message : String(err) };
@@ -147,7 +173,7 @@ async function loadProvider(provider: MangaProviderId, media: MediaDetail, force
     20 * MIN,
     async () => {
       try {
-        const source = SOURCES[provider];
+        const source = getSource(provider); if (!source) return { summary: { provider, sourceId: null, title: null, chapterCount: 0, latest: null, error: "Source not found" }, chapters: [] };
         const hit = await source.find(media);
         const chapters = hit ? await source.chapters(hit.sourceId) : [];
         return {
@@ -178,9 +204,12 @@ export async function chapterList(mediaId: number, provider?: MangaProviderId | 
   const media = await anilist.media(mediaId);
   // A fresh health check runs alongside, so a source that just went down is skipped next time.
   void providerHealth().catch(() => {});
-  const results = await Promise.all(MANGA_PROVIDERS.map(({ id }) => loadProvider(id, media, force)));
-
   const preferred = provider ?? (store().settings.mangaProvider !== 'auto' ? (store().settings.mangaProvider as MangaProviderId) : null);
+  const providersToCheck: MangaProviderId[] = MANGA_PROVIDERS.map(({ id }) => id);
+  if (preferred && !providersToCheck.includes(preferred)) {
+    providersToCheck.push(preferred);
+  }
+  const results = await Promise.all(providersToCheck.map((id) => loadProvider(id, media, force)));
   let chosen = preferred ? results.find((r) => r.summary.provider === preferred && readable(r)) : undefined;
   if (!chosen) {
     chosen = [...results].sort((a, b) => {
@@ -199,9 +228,18 @@ export async function chapterList(mediaId: number, provider?: MangaProviderId | 
 }
 
 export function chapterPages(chapter: Chapter): Promise<ChapterPage[]> {
-  const [provider, ...rest] = chapter.id.split(':');
-  const sourceId = rest.join(':');
-  const source = SOURCES[provider as MangaProviderId];
+  let provider: MangaProviderId;
+  let sourceId: string;
+  if (chapter.id.startsWith('ext:')) {
+    const parts = chapter.id.slice(4).split(':');
+    provider = `ext:${parts[0]}` as MangaProviderId;
+    sourceId = parts.slice(1).join(':');
+  } else {
+    const [p, ...rest] = chapter.id.split(':');
+    provider = p as MangaProviderId;
+    sourceId = rest.join(':');
+  }
+  const source = getSource(provider);
   if (!source) return Promise.reject(new Error('That chapter comes from a source PlayzAnime no longer uses.'));
   // MangaDex@Home URLs are tokenised and expire, so keep them briefly.
   const saver = store().settings.dataSaver;

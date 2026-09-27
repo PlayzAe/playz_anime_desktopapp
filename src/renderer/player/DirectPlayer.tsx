@@ -5,6 +5,7 @@ import { Menu } from '../components/Controls';
 import { Icon } from '../components/Icon';
 import { Spinner } from '../components/States';
 import { clock } from '../lib/format';
+import { SubtitleCustomizerDialog, applySubtitleStyleToElement, loadSubtitleStyle, type SubtitleStyle } from './SubtitleCustomizer';
 import './player.css';
 
 export interface DirectPlayerProps {
@@ -65,6 +66,8 @@ export function DirectPlayer(props: DirectPlayerProps) {
   const [levels, setLevels] = useState<{ index: number; height: number }[]>([]);
   const [level, setLevel] = useState(-1);
   const [subIndex, setSubIndex] = useState(-1);
+  const [subStyle, setSubStyle] = useState<SubtitleStyle>(loadSubtitleStyle);
+  const [customizerOpen, setCustomizerOpen] = useState(false);
   const [chrome, setChrome] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [hover, setHover] = useState<{ x: number; t: number } | null>(null);
@@ -77,6 +80,12 @@ export function DirectPlayer(props: DirectPlayerProps) {
   const watchedSent = useRef(false);
   const upNextDismissed = useRef(false);
   const hideTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (rootRef.current) {
+      applySubtitleStyleToElement(rootRef.current, subStyle);
+    }
+  }, [subStyle]);
 
   const video = () => videoRef.current!;
 
@@ -636,11 +645,18 @@ export function DirectPlayer(props: DirectPlayerProps) {
 
           {stream.subtitles.length > 0 && (
             <Menu
-              width={220}
+              width={240}
               heading="Subtitles"
               items={[
                 { key: 'off', label: 'Off', checked: subIndex === -1, onSelect: () => setSubIndex(-1) },
                 ...stream.subtitles.map((s, i) => ({ key: s.url, label: s.label, checked: subIndex === i, onSelect: () => setSubIndex(i) })),
+                'divider' as const,
+                {
+                  key: 'customize-subs',
+                  label: 'Subtitle Appearance...',
+                  icon: 'settings' as const,
+                  onSelect: () => setCustomizerOpen(true),
+                },
               ]}
               trigger={({ toggle: open }) => (
                 <button type="button" className={`pbtn ${subIndex >= 0 ? 'is-on' : ''}`} aria-label="Subtitles (C)" title="Subtitles (C)" onClick={open}>
@@ -650,7 +666,7 @@ export function DirectPlayer(props: DirectPlayerProps) {
             />
           )}
           <Menu
-            width={230}
+            width={240}
             items={[
               ...(levels.length > 1
                 ? [
@@ -662,9 +678,16 @@ export function DirectPlayer(props: DirectPlayerProps) {
                   ? [{ key: 'q-only', label: `${levels[0].height}p`, hint: 'Only quality', disabled: true, onSelect: () => {} }, 'divider' as const]
                   : []),
               ...SPEEDS.map((s) => ({ key: `s${s}`, label: s === 1 ? 'Normal speed' : `${s}×`, checked: speed === s, onSelect: () => pickSpeed(s) })),
+              'divider' as const,
+              {
+                key: 'sub-style',
+                label: 'Subtitle Appearance...',
+                icon: 'subtitles' as const,
+                onSelect: () => setCustomizerOpen(true),
+              },
             ]}
             trigger={({ toggle: open }) => (
-              <button type="button" className="pbtn" aria-label="Quality and speed" title="Quality and speed" onClick={open}>
+              <button type="button" className="pbtn" aria-label="Quality, speed & subtitles" title="Quality, speed & subtitles" onClick={open}>
                 <Icon name="settings" size={20} />
               </button>
             )}
@@ -690,6 +713,13 @@ export function DirectPlayer(props: DirectPlayerProps) {
           </button>
         </div>
       </div>
+
+      <SubtitleCustomizerDialog
+        open={customizerOpen}
+        onClose={() => setCustomizerOpen(false)}
+        style={subStyle}
+        onChange={setSubStyle}
+      />
     </div>
   );
 }

@@ -1,177 +1,145 @@
-﻿<p align="center">
-  <a href="https://playzae.github.io/playz_anime_landingpage/">
-    <img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/icon.png" alt="PlayzAnime Logo" width="75px" />
-  </a>
+<p align="center">
+<a href="https://playz-anime.onrender.com/">
+<img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/icon.png" alt="PlayzAnime Logo" width="75px"/>
+</a>
 </p>
 
-<h1 align="center"><b>PlayzAnime - Desktop Edition</b></h1>
+<h1 align="center"><b>PlayzAnime</b></h1>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/og.png" alt="PlayzAnime Preview" width="100%" />
+<img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/og.png" alt="PlayzAnime Preview" width="100%"/>
 </p>
 
 <p align="center">
   <a href="https://playzae.github.io/playz_anime_landingpage/">Website</a> |
-  <a href="https://playz-anime.onrender.com">Web App</a> |
-  <a href="https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime">Download Release</a> |
-  <a href="#features">Features</a> |
-  <a href="#why-i-built-playzanime-inspiration--better-downloads">Why PlayzAnime?</a> |
+  <a href="https://playz-anime.onrender.com">Watch Online (Web App)</a> |
+  <a href="https://playzae.github.io/playz_anime_landingpage/docs">Documentation</a> |
   <a href="https://playzae.github.io/playz_anime_landingpage/docs/policies/dmca">Copyright</a>
 </p>
 
 <div align="center">
-  <a href="https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime">
-    <img src="https://img.shields.io/badge/Release-Playz__Anime-crimson?style=flat-square" alt="Release" />
+  <a href="https://github.com/PlayzAe/playz_anime">
+    <img src="https://img.shields.io/github/stars/PlayzAe/playz_anime?style=flat-square&color=crimson" alt="GitHub Stars" />
   </a>
-  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-f0532c?style=flat-square" alt="Windows 10 and 11" />
-  <img src="https://img.shields.io/badge/Electron-30+-2b2622?style=flat-square&logo=electron" alt="Electron" />
-  <img src="https://img.shields.io/badge/React-19-2b2622?style=flat-square&logo=react" alt="React 19" />
-  <img src="https://img.shields.io/badge/Ads-None-93c48d?style=flat-square" alt="No ads" />
-  <a href="https://github.com/PlayzAe"><img src="https://img.shields.io/static/v1?label=Support&message=GitHub&style=flat-square&logo=GitHub&color=%23f0532c" alt="Support" /></a>
+  <a href="https://playz-anime.onrender.com">
+    <img src="https://img.shields.io/badge/Web%20App-Online-brightgreen?style=flat-square" alt="Status" />
+  </a>
+  <a href="https://github.com/PlayzAe/playz_anime">
+    <img src="https://img.shields.io/badge/Platform-Web%20%7C%20Windows-blue?style=flat-square" alt="Platforms" />
+  </a>
+  <a href="https://github.com/PlayzAe/playz_anime/blob/main/docs/LEGAL.md">
+    <img src="https://img.shields.io/badge/License-Proprietary-red?style=flat-square" alt="License" />
+  </a>
 </div>
+
+<h5 align="center">
+Leave a star if you like the project.
+</h5>
 
 <br>
 
 ## About
 
-I built **PlayzAnime Desktop** because I wanted a clean, fast, standalone Windows app for **watching and downloading anime** and **reading and downloading manga, manhwa, and manhua** without dealing with web ads, slow torrent swarms, or bloated media servers.
-
-All metadata, trending lists, and seasonal schedules sync directly from AniList. Anime streams and manga chapters are fetched straight from resilient online sources. My app features its own native video player, a responsive manga reader, offline media library storage, and portable profiles you can easily export and share with friends as a file.
+PlayzAnime is a **streaming platform** and **media client** with a **web app** and **desktop edition** for streaming anime, reading manga, and managing your AniList library with custom players and zero ads.
 
 > [!IMPORTANT]
-> PlayzAnime does not host, upload, or distribute any media. It parses content that third-party sites already make publicly available. Users are responsible for complying with their local copyright laws.
+> PlayzAnime does not host, upload, or store any video files on its servers. All streams, episodes, and manga chapters are scraped from third-party services and public APIs. Users are responsible for complying with their local copyright laws.
 
----
-
-## Why I Built PlayzAnime (Inspiration & Better Downloads)
-
-[Seanime](https://github.com/5rahim/seanime) was a huge inspiration for my UI layout, tracker integration, and overall vision. But if you have ever looked through community issue trackers, you know the biggest headaches with traditional anime media servers: **torrents dying, buffer holes, and download corruption.**
-
-Most media servers depend heavily on BitTorrent protocols:
-- If a torrent has **0 seeders**, your download is dead in the water.
-- If leechers choke the swarm, your speeds drop to a crawl.
-- Torrents trigger ISP copyright letters unless you pay for a VPN or a Debrid service.
-- If your system crashes or restarts mid-torrent, files frequently recheck or get corrupted.
-
-### How I do it differently:
-- **Zero Seeder Dependency:** My downloads **never** rely on seeders, peers, or torrent swarms. Mine will never go down unless the provider itself goes down.
-- **Unstoppable Auto-Resume:** You can pause, turn off your PC, restart your computer, or lose your internet connection completely - my downloader immediately picks up right at the exact byte it left off from. Nothing gets corrupted.
-- **Smart Chunk Architecture:** How do I bypass stream throttling and pack clean MP4s with embedded subtitles automatically? That is my secret sauce - **look through the source code in this repo** if you want to see how my download engine works under the hood.
-- **Self-Contained & Lightweight:** No complex local Docker daemons, external database services, or complex ports to forward. Just double-click and run.
-
-### Issues I Specifically Solved in My App:
-- **HLS Buffer Holes & Stream Stalls** (#953, #847): My HLS player uses an adaptive pre-buffering pipeline with seamless quality fallback so playback never stutters.
-- **Subtitle Desync & Disappearing Tracks** (#940, #919, #881): Subtitles are extracted and rendered directly in my custom player pipeline.
-- **Downloads Stuck at 0 KB/s** (#957, #912): No waiting for peers or dead torrents; chunks download at maximum CDN wire speed.
-- **Manga Cache Loss After Restart** (#905, #641): All downloaded manga chapters save directly as standard `.cbz` files with `ComicInfo.xml` metadata in permanent disk folders.
-- **Player Closes Between Episodes** (#902): Full autoplay progression queue - the next episode loads smoothly without closing your player window.
-- **Border Scroll Bugs in Manga Reader** (#903, #918): Fully optimized smooth keyboard navigation and infinite scroll.
+> [!NOTE]
+> **Mobile & Android Display Notice:**
+> The web streaming platform is designed for **laptops, TVs, and desktop monitors**. Android and phone browser viewing is currently unoptimized and may appear scattered. A dedicated native **Android app is coming soon**!
 
 ---
 
 ## Features
 
-- **My Own Native Player:** Streams play directly in PlayzAnime's player with zero ads: auto skip intro/outro, next episode autoplay, subtitle rendering in any language, keyboard shortcuts, picture-in-picture, taskbar playback controls, and Windows media keys.
-- **Bulletproof Downloads:** Episodes download as standard MP4 with embedded subtitles; manga chapters download as CBZ. Downloads resume automatically where they stopped, survive system restarts, and organize cleanly: `PlayzAnime\<Show>\Season 2\<Show>_E05_720p.mp4` and `PlayzManga\<Series>\<Series>_Ch012.cbz`.
-- **True Offline Mode:** With zero internet connection, PlayzAnime opens straight to your local library. Watch downloaded episodes and read saved manga chapters grouped by series, season, and quality.
-- **Multi-Source Manga Auto-Pick:** MangaDex, WeebCentral, Flame Comics, and MangaPill are searched in parallel. My app automatically serves chapters from whichever source is furthest along, skipping any that are unresponsive. Includes a live health check in Settings.
-- **Dual-Mode Manga Reader:** Traditional manga opens right-to-left in single pages; manhwa and webtoons open in a continuous vertical scroll strip. Features fit-to-width/height, keyboard navigation, and instant source switching.
-- **Portable User Profiles:** Create a custom profile with avatars and favorite lists. Export your profile as a compact `.playzanime` file to share with friends, allowing them to view your watchlist in its own isolated tab.
-- **Automated First-Run Setup:** First launch sets up storage directories, verifies Windows Controlled Folder Access (with one-click allowlisting), and warms the catalog in your custom accent theme.
-- **Low-Bandwidth Data Saver:** Limits video buffer consumption, caps stream resolution at 720p, and serves compressed image pages from providers.
-
----
-
-## Screenshots
-
-<table>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/screenshots/home.png" alt="Home Screen" /></td>
-    <td><img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/screenshots/manga.png" alt="Manga Reader" /></td>
-  </tr>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/screenshots/downloads.png" alt="Downloads Manager" /></td>
-    <td><img src="https://raw.githubusercontent.com/PlayzAe/playz_anime_landingpage/main/public/screenshots/profiles.png" alt="User Profiles" /></td>
-  </tr>
-</table>
+- **Native Custom Player:** Powered by `hls.js` with adaptive bitrate streaming (1080p, 720p, 480p, 360p), full keyboard shortcuts, smooth volume controls, and picture-in-picture.
+- **In-Player Subtitle Customizer:** Real-time subtitle styling directly in the player. Customize font size (small to huge), colors (classic white, anime yellow, cyan, emerald), background styles (box, drop-shadow, outline), font families, and vertical position.
+- **Auto Skip Intro & Outro:** Automatically identifies episode intro/outro marks and skips them seamlessly.
+- **Dual-Audio Support & Download Subtitles:** Instant toggle between Sub (Japanese audio with subtitles) and Dub (English audio). When downloading, choose any subtitle track to embed into the MP4—even with English Dub.
+- **55+ Multi-Source Manga & Manhwa Engine:** Tachiyomi/Mihon-inspired architecture featuring 55+ scanlation teams and aggregators (Asura Scans, Reaper Scans, Bato.to, MangaReader, MangaFreak, MangaSee, MangaDex, etc.) with smart chapter auto-picking and in-reader source switcher.
+- **Zero-Captcha Anti-Bot & DDoS Shield:** Sliding-window rate limiter and instant exploit probe dropping to maintain zero latency and prevent bot crashes on low-tier hosting (e.g. Render Free Tier).
+- **Auto-Update Notifier:** Checks official GitHub releases on boot (after animations finish) using zero API keys and alerts users to new features and downloads.
+- **AniList Integration:** Real-time client-side catalog browsing, seasonal charts, trending releases, airing schedules, and search with zero server bottlenecks.
+- **Embed Fallback:** Switch between the native player and third-party embed players on the fly with built-in ad and popup filtering.
+- **Data Saver Mode:** Compresses manga pages for low-bandwidth connections.
+- **Zero Tracking & Privacy:** Watch history, reading progress, and custom profile settings are stored 100% locally in your browser.
+- **Docker & Cloud Ready:** Production multi-stage Docker setup ready to deploy to Render, Koyeb, or your own VPS.
 
 ---
 
 ## Get started
 
-Grab the latest build from my official release:
+Launch the live web application directly in your browser:
 
 <p align="center">
-<a href="https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime" style="font-size:18px;">
-<b>Download PlayzAnime v0.1.0 for Windows -></b>
+<a href="https://playz-anime.onrender.com" style="font-size:18px;">
+<b>Open PlayzAnime Web App →</b>
 </a>
 </p>
 
-1. Download **`PlayzAnime-Setup-0.1.0.exe`** (Installer) or **`PlayzAnime-Portable-0.1.0.exe`** (Single Portable Binary).
-2. If Windows SmartScreen displays a warning for unsigned software: click **More info** -> **Run anyway**.
-3. Launch the app. First-run configuration takes under a minute.
+<br>
 
-> [!TIP]
-> **Controlled Folder Access Warning:** If Windows Defender Ransomware Protection is enabled, it may block writes to Desktop/Documents. Choose **Allow PlayzAnime** during setup or in **Settings -> Downloads**, or run `resources\tools\allow-folder-access.bat` from the installation directory.
+## Tech stack
 
----
-
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-|---|---|
-| `Ctrl K` or `/` | Search anime and manga |
-| `Space` or `K` | Play / Pause |
-| `J` / `L` | Seek backward / forward 10 seconds |
-| `<-` / `->` | Seek backward / forward 5 seconds |
-| `N` / `P` | Next / Previous episode |
-| `S` | Skip intro / outro |
-| `C` | Cycle subtitles |
-| `F` / `T` | Fullscreen / Theater mode |
-| `[` / `]` | Previous / Next manga chapter |
-| `M` | Switch between Scroll and Page reading mode |
+* **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/), [Motion](https://motion.dev/)
+* **Player Pipeline:** [hls.js](https://github.com/video-dev/hls.js/)
+* **Backend Server:** [Node.js](https://nodejs.org/), [esbuild](https://esbuild.github.io/)
+* **Desktop Client:** [Electron](https://www.electronjs.org/)
 
 ---
 
-## Development & Build
+## Development and Build
 
-### Prerequisites
-- Node.js >= 20 LTS
-- npm >= 9
-- Windows 10 or 11 (64-bit)
+Building from source is straightforward. You will need [Node.js](https://nodejs.org/) (>= 20) and npm installed on your system.
 
-### Commands
+### 1. Install dependencies
 ```bash
-# Start development server with hot-reload
-npm run dev
-
-# Run self-tests (verifies HLS extraction, MP4 remuxing, offline storage)
-npm run selftest
-
-# Package Windows Installer and Portable executable
-npm run package:win
+npm install
+npm install --prefix server
 ```
 
-The compiled binaries will be output to the `release/` directory.
+### 2. Start development mode
+```bash
+# Windows convenience script (launches frontend on :5311 and server on :5310)
+start.bat
+```
+Or start each service manually:
+```bash
+# Terminal 1: Backend Server
+npm --prefix server run dev
+
+# Terminal 2: Frontend
+npm run dev
+```
+
+### 3. Production Build
+```bash
+npm run build
+npm --prefix server run build
+npm --prefix server start
+```
 
 ---
 
-## Tech Stack
+This repository includes a multi-stage [Dockerfile](Dockerfile) ready for one-click deployment. See [docs/DEPLOY.md](docs/DEPLOY.md) for full instructions.
 
-* **Shell & Core:** [Electron](https://www.electronjs.org/)
-* **Frontend:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vite.dev/)
-* **Media Remuxing:** [ffmpeg](https://ffmpeg.org/) (downloaded on demand for episode packaging)
-* **Metadata & Tracker:** [AniList GraphQL API](https://graphql.anilist.co)
+1. Connect this repo to **[Render](https://render.com)** as a **Web Service**.
+2. Set Runtime to **Docker** and Instance Type to **Free**.
+3. Configure the following Environment Variables:
+   - `HOST` = `0.0.0.0`
+   - `PLAYZANIME_RELAY` = `on`
+   - `PROXY_SECRET` = `<random_string>`
+   - `ALLOWED_ORIGINS` = `https://playzae.github.io`
+4. Click **Deploy Web Service**. Render serves both the frontend and streaming backend from one URL.
 
----
-
-## License & Policies
-
-Distributed under custom fair-use terms. For DMCA notices and takedown requests, consult [Legal & DMCA Policies](https://playzae.github.io/playz_anime_landingpage/docs/policies/copyright-and-dmca) (or /docs/policies/dmca).
+<br>
 
 > [!IMPORTANT]
 > The public web streaming instance has a high tendency to go down, face upstream blocks, or get taken down quickly. Domain changes for both the streaming website and landing page are coming soon.
 > 
 > To guarantee continuous, uninterrupted access:
 > - **Bookmark the landing page and GitHub:** Keep [playzae.github.io/playz_anime_landingpage](https://playzae.github.io/playz_anime_landingpage/) bookmarked for active mirrors and domain announcements.
-> - **Use this Desktop App:** The desktop app runs locally, streams directly, supports true offline downloads, and will never go down. Always check [PlayzAe/playz_anime_desktopapp](https://github.com/PlayzAe/playz_anime_desktopapp) for the latest updates and releases.
+> - **Download the Windows Desktop App:** The desktop app runs locally, streams directly, supports true offline downloads, and will never go down. Check [PlayzAe/playz_anime_desktopapp](https://github.com/PlayzAe/playz_anime_desktopapp) for the latest release.
+> 
+> For copyright requests and DMCA notices, refer to [playzae.github.io/playz_anime_landingpage/docs/policies/copyright-and-dmca](https://playzae.github.io/playz_anime_landingpage/docs/policies/copyright-and-dmca).

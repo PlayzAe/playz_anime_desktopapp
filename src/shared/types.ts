@@ -197,7 +197,16 @@ export const MANGA_PROVIDERS: { id: MangaProviderId; name: string; note: string 
   { id: 'mangapill', name: 'MangaPill', note: 'Fast, popular manga; a good fallback' },
 ];
 
-export const providerName = (id: MangaProviderId | null | undefined) => MANGA_PROVIDERS.find((p) => p.id === id)?.name ?? (id || 'the source');
+export const providerName = (id: MangaProviderId | null | undefined): string => {
+  if (!id) return 'the source';
+  const found = MANGA_PROVIDERS.find((p) => p.id === id);
+  if (found) return found.name;
+  if (id.startsWith('ext:')) {
+    const raw = id.slice(4).replace(/[-_]/g, ' ');
+    return raw.replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  return id;
+};
 
 export interface ProviderHealth {
   provider: MangaProviderId;

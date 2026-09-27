@@ -397,3 +397,125 @@
   color: var(--paper-3);
 }
 
+/* ── 21st.dev Style Extensions Hero Banner ── */
+.extensions-hero-banner {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.extensions-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.extensions-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.extensions-hero-title h4 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--paper);
+  letter-spacing: -0.2px;
+}
+
+.extensions-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: sourcePulse 2s infinite ease-in-out;
+}
+
+.extensions-hero-count {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+.extensions-hero-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--paper-2);
+  margin: 0 0 16px 0;
+  max-width: 650px;
+}
+
+.extensions-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.extensions-step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: all 0.2s ease;
+}
+
+.extensions-step-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.step-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--paper-3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.step-content strong {
+  font-size: 12.5px;
+  color: var(--paper);
+}
+
+.step-content span {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--paper-3);
+}
+
+.step-content em {
+  color: #10b981;
+  font-style: normal;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .extensions-steps {
+    grid-template-columns: 1fr;
+  }
+}
+

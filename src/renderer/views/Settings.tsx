@@ -441,6 +441,44 @@ function ExtensionsManager() {
 
   return (
     <div className="extensions-manager">
+      <div className="extensions-hero-banner">
+        <div className="extensions-hero-header">
+          <div className="extensions-hero-title">
+            <span className="extensions-pulse-dot" />
+            <h4>Multi-Source Engine (Tachiyomi / Mihon Core)</h4>
+          </div>
+          <span className="extensions-hero-count">
+            {items.filter((x) => x.enabled).length} of {items.length} Active
+          </span>
+        </div>
+        <p className="extensions-hero-desc">
+          Extensions automatically scrape and serve chapters from scanlation groups and aggregator sources. Toggle any provider below to control what is active.
+        </p>
+        <div className="extensions-steps">
+          <div className="extensions-step-card">
+            <div className="step-num">01</div>
+            <div className="step-content">
+              <strong>Enable Sources</strong>
+              <span>Toggle providers below. Active extensions are instantly queried.</span>
+            </div>
+          </div>
+          <div className="extensions-step-card">
+            <div className="step-num">02</div>
+            <div className="step-content">
+              <strong>Smart Auto-Pick</strong>
+              <span>Automatically picks the source with the highest chapter count.</span>
+            </div>
+          </div>
+          <div className="extensions-step-card">
+            <div className="step-num">03</div>
+            <div className="step-content">
+              <strong>Switch On The Fly</strong>
+              <span>On any manga or manhwa page, click <em>Source</em> to switch scanlators.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="extensions-toolbar">
         <input
           type="search"

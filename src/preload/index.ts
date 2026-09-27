@@ -33,6 +33,8 @@ const api: PlayzAnimeApi = {
     chapters: call('manga:chapters'),
     pages: call('manga:pages'),
     health: call('manga:health'),
+    extensions: call('manga:extensions'),
+    toggleExtension: call('manga:toggleExtension'),
   },
   library: {
     all: call('library:all'),

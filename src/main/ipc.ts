@@ -94,6 +94,11 @@ export function registerIpc(hooks: IpcHooks) {
     if (!chapter?.id) throw new Error('Unknown chapter.');
     return chapterPages(chapter);
   });
+  handle('manga:extensions', () => listExtensions());
+  handle('manga:toggleExtension', (id: string, enabled: boolean) => {
+    toggleExtension(String(id), Boolean(enabled));
+    return { ok: true };
+  });
 
   // Library
   handle('library:all', () => store().library());

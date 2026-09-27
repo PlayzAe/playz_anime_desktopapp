@@ -32,6 +32,7 @@ export function EpisodeDownloadDialog({ open, onClose, media, episodes, initial,
   const [to, setTo] = useState(initial?.to ?? last);
   const [audio, setAudio] = useState<Audio>(defaultAudio);
   const [quality, setQuality] = useState<QualityPref>(settings.quality);
+  const [subTrack, setSubTrack] = useState<string>('default');
   const hasDub = episodes.some((e) => e.dubUrl);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export function EpisodeDownloadDialog({ open, onClose, media, episodes, initial,
       audio,
       embedUrl: (audio === 'dub' ? e.dubUrl : e.subUrl)!,
       quality,
+      subtitleLabel: subTrack === 'none' ? 'none' : subTrack === 'default' ? (settings.subtitleLanguage || 'English') : subTrack,
     }));
     const added = await window.playzanime.downloads.startMany(reqs);
     onClose();
@@ -107,6 +109,23 @@ export function EpisodeDownloadDialog({ open, onClose, media, episodes, initial,
             { value: 'dub', label: 'English dub', disabled: !hasDub, title: hasDub ? undefined : 'No dub for this show' },
           ]}
         />
+      </div>
+      <div className="field">
+        <span className="field-label">Subtitles to Include</span>
+        <Segmented
+          label="Subtitles"
+          value={subTrack}
+          onChange={setSubTrack}
+          options={[
+            { value: 'default', label: `${settings.subtitleLanguage || 'English'} (Default)` },
+            { value: 'Spanish', label: 'Spanish' },
+            { value: 'French', label: 'French' },
+            { value: 'none', label: 'None (Audio only)' },
+          ]}
+        />
+        <span className="field-note">
+          Subtitles are packed directly into the MP4 (works with both Dub and Sub).
+        </span>
       </div>
       <div className="field">
         <span className="field-label">Quality</span>

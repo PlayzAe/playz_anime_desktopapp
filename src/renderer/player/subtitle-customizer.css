@@ -1,0 +1,90 @@
+/* ── 21st.dev Style Subtitle Customizer Modal ── */
+.sub-customizer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.sub-preview-box {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+.sub-preview-scene {
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 18px;
+  background: radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.6) 0%, rgba(10, 10, 12, 0.95) 100%);
+}
+
+.sub-preview-text {
+  display: inline-block;
+  max-width: 90%;
+  padding: 3px 12px;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1.35;
+  font-weight: 560;
+  transition: all 0.15s ease;
+}
+
+.sub-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sub-field-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+}
+
+.sub-color-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.sub-color-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  color: var(--paper-2);
+  font-size: 12.5px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sub-color-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--paper);
+}
+
+.sub-color-pill.is-selected {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--paper);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+.color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
