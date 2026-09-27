@@ -12,10 +12,6 @@ const api = () => window.playzanime;
 
 // The policies live on the PlayzAnime website; until it has its own domain, the GitHub page links there.
 const LEGAL_URL = 'https://github.com/PlayzAe';
-const openLegal = (e: { preventDefault: () => void }) => {
-  e.preventDefault();
-  void api().app.openExternal(LEGAL_URL);
-};
 
 const ACCENTS: { key: AccentKey; name: string; kanji: string; color: string }[] = [
   { key: 'shu', name: 'Shu', kanji: '朱', color: '#f0532c' },
@@ -277,11 +273,12 @@ export function Settings() {
               </p>
               <p className="about-credits">
                 Titles, artwork and schedules come from AniList. Chapters come from MangaDex, WeebCentral, Flame Comics and MangaPill, and episodes from third-party hosts. PlayzAnime
-                doesn’t host, upload or distribute any video or pages, and isn’t affiliated with any of them or with any studio, publisher or streaming service.
+                doesn’t host, upload or store any video or pages; its server only forwards requests as they happen. It isn’t affiliated with any source, studio, publisher or streaming
+                service.
               </p>
               <p className="about-credits">
                 By using PlayzAnime you agree to its{' '}
-                <a href={LEGAL_URL} onClick={openLegal}>
+                <a href={LEGAL_URL} target="_blank" rel="noopener noreferrer">
                   terms, copyright policy and privacy policy
                 </a>
                 .
@@ -380,17 +377,35 @@ function SourceHealth() {
       {MANGA_PROVIDERS.map((p) => {
         const h = byId.get(p.id);
         const state = !h ? 'checking' : h.ok ? (h.ms > 4000 ? 'slow' : 'up') : 'down';
+        const isCloudflare = h?.error?.includes('403');
+        const stateLabel =
+          state === 'checking'
+            ? 'Checking…'
+            : state === 'down'
+              ? isCloudflare
+                ? 'Blocked (Cloudflare 403)'
+                : 'Unreachable'
+              : `${(h!.ms / 1000).toFixed(1)} s`;
+        const stateTitle = isCloudflare
+          ? 'Cloudflare WAF blocked this datacenter hosting IP (Render/AWS). Keep Manga source on Auto for automatic fallback, or use the Desktop App for direct access.'
+          : (h?.error ?? undefined);
+
         return (
           <div key={p.id} className={`source is-${state}`}>
             <span className="source-dot" aria-hidden="true" />
             <span className="source-name">{p.name}</span>
             <span className="source-note">{p.note}</span>
-            <span className="source-state num" title={h?.error ?? undefined}>
-              {state === 'checking' ? 'Checking…' : state === 'down' ? 'Unreachable' : `${(h!.ms / 1000).toFixed(1)} s`}
+            <span className="source-state num" title={stateTitle}>
+              {stateLabel}
             </span>
           </div>
         );
       })}
+      <div className="sources-cloud-notice">
+        <span className="sources-cloud-notice-title">Web Hosting & Source Availability:</span>
+        Cloudflare blocks datacenter hosting IPs (e.g. Render, AWS) for certain sources (WeebCentral, Flame) with HTTP 403.
+        In <strong>Auto</strong> mode, PlayzAnime automatically skips blocked sources and serves all manhwa and manga through healthy providers (Asura Scans, MangaDex, MangaPill). For 100% direct access to all 5 sources without cloud blocks, use the <strong>PlayzAnime Desktop App</strong>.
+      </div>
       <button type="button" className="sources-recheck" onClick={() => setForce((n) => n + 1)}>
         <Icon name="refresh" size={14} /> Check again
       </button>
