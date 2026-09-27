@@ -313,7 +313,7 @@ function ReaderView({ mediaId: id, title, media, webtoon, chapters, chapterId, p
       <div className={`reader-strip fit-${fit} ${webtoon ? 'is-webtoon' : ''}`}>
         {pages.data.map((p, i) => (
           <div key={p.url} className="reader-page" data-page={i + 1} ref={(el) => void (pageRefs.current[i] = el)} style={aspect(p)}>
-            <img src={p.url} alt={`Page ${i + 1}`} loading={i < 3 || Math.abs(i + 1 - page) < 3 ? 'eager' : 'lazy'} decoding="async" draggable={false} />
+            <img src={p.url} alt={`Page ${i + 1}`} loading={i < 3 || Math.abs(i + 1 - page) < 3 ? 'eager' : 'lazy'} decoding="async" referrerPolicy="no-referrer" draggable={false} />
           </div>
         ))}
         {endCard}
@@ -323,7 +323,7 @@ function ReaderView({ mediaId: id, title, media, webtoon, chapters, chapterId, p
     const current: ChapterPage | undefined = pages.data[page - 1];
     body = (
       <div className={`reader-paged fit-${fit} dir-${direction}`}>
-        {current ? <img key={current.url} src={current.url} alt={`Page ${page}`} draggable={false} /> : endCard}
+        {current ? <img key={current.url} src={current.url} alt={`Page ${page}`} referrerPolicy="no-referrer" draggable={false} /> : endCard}
         <button type="button" className="reader-zone is-left" aria-label={direction === 'rtl' ? 'Next page' : 'Previous page'} onClick={() => turn(direction === 'rtl' ? 1 : -1)} />
         <button type="button" className="reader-zone is-right" aria-label={direction === 'rtl' ? 'Previous page' : 'Next page'} onClick={() => turn(direction === 'rtl' ? -1 : 1)} />
       </div>

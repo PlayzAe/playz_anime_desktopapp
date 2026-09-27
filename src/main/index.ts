@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, Menu, net, protocol, screen, session, type WebContents } from 'electron';
+import { app, BrowserWindow, dialog, Menu, nativeImage, type NativeImage, net, protocol, screen, session, type WebContents } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -180,7 +180,27 @@ function harden(contents: WebContents) {
 
 function createWindow() {
   const state = store().windowState;
-  const iconPath = path.join(app.getAppPath(), 'build', 'icon.png');
+  let initialIcon: NativeImage | undefined;
+  const candidateIconPaths = [
+    path.join(__dirname, '../../build/icon.ico'),
+    path.join(__dirname, '../../build/icon.png'),
+    path.join(app.getAppPath(), 'build/icon.ico'),
+    path.join(app.getAppPath(), 'build/icon.png'),
+    path.join(process.resourcesPath, 'build/icon.ico'),
+    path.join(process.resourcesPath, 'build/icon.png'),
+  ];
+  for (const p of candidateIconPaths) {
+    try {
+      if (fs.existsSync(p)) {
+        const buf = fs.readFileSync(p);
+        const img = nativeImage.createFromBuffer(buf);
+        if (!img.isEmpty()) {
+          initialIcon = img;
+          break;
+        }
+      }
+    } catch {}
+  }
 
   const win = new BrowserWindow({
     ...safeBounds(state),
@@ -189,7 +209,7 @@ function createWindow() {
     show: false,
     backgroundColor: INK,
     title: 'PlayzAnime',
-    icon: fs.existsSync(iconPath) ? iconPath : undefined,
+    icon: initialIcon,
     titleBarStyle: 'hidden',
     titleBarOverlay:
       process.platform === 'darwin' ? undefined : { color: INK, symbolColor: '#e9e3da', height: TITLEBAR_HEIGHT },

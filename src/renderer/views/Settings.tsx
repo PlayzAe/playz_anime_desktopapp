@@ -11,7 +11,7 @@ import './settings.css';
 const api = () => window.playzanime;
 
 // The policies live on the PlayzAnime website; until it has its own domain, the GitHub page links there.
-const LEGAL_URL = 'https://github.com/PlayzAe';
+const LEGAL_URL = 'https://github.com/PlayzAe/playz_anime/blob/main/LEGAL.md';
 
 const ACCENTS: { key: AccentKey; name: string; kanji: string; color: string }[] = [
   { key: 'shu', name: 'Shu', kanji: '朱', color: '#f0532c' },
@@ -264,6 +264,97 @@ export function Settings() {
             <Button variant="primary" icon="heart" onClick={() => void api().app.openExternal('https://github.com/PlayzAe')}>
               github.com/PlayzAe
             </Button>
+          </div>
+        </Group>
+
+        <Group title="Documentation & Architecture">
+          <div className="doc-links-grid">
+            <div className="doc-link-card">
+              <div className="doc-link-header">
+                <Icon name="layers" size={16} />
+                <strong>Multi-Source Engine Architecture</strong>
+              </div>
+              <p>
+                Learn how PlayzAnime indexes 55+ Mihon & Tachiyomi scanlation extensions, automatically detects Cloudflare WAF blocks, and dynamically switches sources.
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="external"
+                onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime#multi-source-engine--extensions')}
+              >
+                Read Engine Docs
+              </Button>
+            </div>
+
+            <div className="doc-link-card">
+              <div className="doc-link-header">
+                <Icon name="shield" size={16} />
+                <strong>Legal, Terms & Privacy Policy</strong>
+              </div>
+              <p>
+                Compliance details, DMCA takedown procedure, zero-log privacy policy, and open-source license information.
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="external"
+                onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime/blob/main/LEGAL.md')}
+              >
+                View Legal Document
+              </Button>
+            </div>
+
+            <div className="doc-link-card">
+              <div className="doc-link-header">
+                <Icon name="tv" size={16} />
+                <strong>Direct Player & HLS Relay Protocol</strong>
+              </div>
+              <p>
+                Technical overview of our stream resolver, in-player subtitle customizer, and low-latency proxy design.
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="external"
+                onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime/blob/main/CONTRACT.md')}
+              >
+                API & Stream Contract
+              </Button>
+            </div>
+
+            <div className="doc-link-card">
+              <div className="doc-link-header">
+                <Icon name="code" size={16} />
+                <strong>Official GitHub Repositories</strong>
+              </div>
+              <p>
+                Source code repositories for Desktop Electron app releases, Web server hosting, and Landing page.
+              </p>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <Button
+                  variant="quiet"
+                  size="sm"
+                  onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime_desktopapp')}
+                >
+                  Desktop Repo
+                </Button>
+                <Button
+                  variant="quiet"
+                  size="sm"
+                  onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime')}
+                >
+                  Web Repo
+                </Button>
+                <Button
+                  variant="quiet"
+                  size="sm"
+                  onClick={() => void api().app.openExternal('https://github.com/PlayzAe/playz_anime_landingpage')}
+                >
+                  Landing Repo
+                </Button>
+              </div>
+            </div>
           </div>
         </Group>
 

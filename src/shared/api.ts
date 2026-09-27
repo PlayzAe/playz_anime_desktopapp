@@ -104,6 +104,8 @@ export interface PlayzAnimeApi {
     clearCache(): Promise<void>;
     /** Drives the Windows taskbar thumbnail buttons while a video is open; null clears them. */
     setPlayer(state: PlayerTaskbarState | null): Promise<void>;
+    /** Dynamically updates the Windows app and taskbar icon to match the user's accent color. */
+    setAppIcon?(dataUrl: string): Promise<{ ok: boolean }>;
     onCommand(listener: (command: AppCommand) => void): () => void;
     /** What the operating system reports; the page also listens to online/offline events. */
     online(): Promise<boolean>;

@@ -519,3 +519,44 @@
   }
 }
 
+/* Documentation Cards */
+.doc-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.doc-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.doc-link-card:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.doc-link-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--paper);
+  font-size: 13.5px;
+}
+
+.doc-link-card p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--paper-3);
+  margin: 0;
+  flex: 1;
+}
+

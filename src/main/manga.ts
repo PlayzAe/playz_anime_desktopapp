@@ -43,6 +43,7 @@ const SOURCES: Record<MangaProviderId, Source> = {
     chapters: (id) => mangadex.chapters(id),
     pages: (id, saver) => mangadex.pages(id, saver),
     ping: () => mangadex.ping(),
+    referer: 'https://mangadex.org/',
   },
   asura: {
     find: async (media) => {

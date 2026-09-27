@@ -80,6 +80,7 @@ const api: PlayzAnimeApi = {
     openDir: call('app:openDir'),
     clearCache: call('app:clearCache'),
     setPlayer: call('app:setPlayer'),
+    setAppIcon: call('app:setIcon'),
     onCommand: (listener) => listen<AppCommand>('app:command', listener),
     online: call('app:online'),
   },

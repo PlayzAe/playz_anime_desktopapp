@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, net, session, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, nativeImage, net, session, shell } from 'electron';
 import fs from 'node:fs';
 import type { DirKind, PlayerTaskbarState } from '../shared/api';
 import type {
@@ -160,6 +160,20 @@ export function registerIpc(hooks: IpcHooks) {
   handle('downloads:missing', () => downloader().missingFiles());
 
   // App
+  handle('app:setIcon', (dataUrl: string) => {
+    const win = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+    if (win && !win.isDestroyed() && dataUrl && typeof dataUrl === 'string') {
+      try {
+        const img = nativeImage.createFromDataURL(dataUrl);
+        if (!img.isEmpty()) {
+          win.setIcon(img);
+        }
+      } catch (err) {
+        log.warn('Failed to set window icon from data URL:', String(err));
+      }
+    }
+    return { ok: true };
+  });
   handle('app:info', () => ({
     version: app.getVersion(),
     platform: process.platform,

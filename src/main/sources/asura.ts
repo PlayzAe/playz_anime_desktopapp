@@ -105,7 +105,7 @@ export async function pages(sourceId: string): Promise<ChapterPage[]> {
     }),
   );
 
-  const urls = [...new Set(html.match(/https:\/\/[^"\s\\]+\/asura-images\/chapters\/[^"\s\\]+\/[0-9]+\/[^"\s\\]+\.webp(?:\?[^"\s\\]*)?/g) ?? [])];
+  const urls = [...new Set(html.match(/https:\/\/[^"'\s\\<>&]+\/asura-images\/chapters\/[^"'\s\\<>&]+\/[0-9]+\/[^"'\s\\<>&]+\.webp(?:\?[^"'\s\\<>&]*)?/g) ?? [])];
   if (!urls.length) {
     const allImgs = [...new Set(html.match(/https:\/\/[^"\s\\]+\/[^"\s\\]+\.(?:webp|jpg|jpeg|png)(?:\?[^"\s\\]*)?/g) ?? [])];
     const filtered = allImgs.filter((u) => u.includes('chapter') || u.includes('storage') || u.includes('cdn'));
