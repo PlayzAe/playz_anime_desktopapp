@@ -55,6 +55,8 @@ export interface PlayzAnimeApi {
     pages(chapter: Chapter): Promise<ChapterPage[]>;
     /** Pings every chapter source; results are kept for 10 minutes unless forced. */
     health(force?: boolean): Promise<ProviderHealth[]>;
+    extensions?(): Promise<MangaExtensionInfo[]>;
+    toggleExtension?(id: string, enabled: boolean): Promise<{ ok: boolean }>;
   };
   library: {
     all(): Promise<LibraryEntry[]>;

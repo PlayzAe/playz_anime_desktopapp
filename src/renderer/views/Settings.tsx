@@ -156,6 +156,10 @@ export function Settings() {
           <SourceHealth />
         </Group>
 
+        <Group title="Manga & Manhwa Extensions (55 Sources)">
+          <ExtensionsManager />
+        </Group>
+
         <Group title="Downloads">
           <Row title="Anime folder" note={settings.animeDir}>
             <div className="row-buttons">
@@ -409,6 +413,77 @@ function SourceHealth() {
       <button type="button" className="sources-recheck" onClick={() => setForce((n) => n + 1)}>
         <Icon name="refresh" size={14} /> Check again
       </button>
+    </div>
+  );
+}
+
+/** Mihon / Tachiyomi style Extensions Manager for 55+ manga and manhwa sources. */
+function ExtensionsManager() {
+  const [filter, setFilter] = useState<'all' | 'manhwa' | 'manga' | 'manhua' | 'webtoon'>('all');
+  const [query, setQuery] = useState('');
+  const [tick, setTick] = useState(0);
+  const extensionsLoader = useLoader(`manga-extensions:${tick}`, () => api().manga.extensions?.() ?? Promise.resolve([]), 5 * 60_000);
+  const items = extensionsLoader.data ?? [];
+
+  const filtered = items.filter((ext) => {
+    if (filter !== 'all' && ext.category !== filter) return false;
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      return ext.name.toLowerCase().includes(q) || ext.note.toLowerCase().includes(q) || ext.engine.toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  const toggle = async (id: string, currentState: boolean) => {
+    await api().manga.toggleExtension?.(id, !currentState);
+    setTick((t) => t + 1);
+  };
+
+  return (
+    <div className="extensions-manager">
+      <div className="extensions-toolbar">
+        <input
+          type="search"
+          className="extensions-search"
+          placeholder="Filter 55 sources (e.g. Asura, Reaper, Bato, Toonily)..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <div className="extensions-tabs">
+          {(['all', 'manhwa', 'manga', 'manhua', 'webtoon'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={`extensions-tab ${filter === tab ? 'is-active' : ''}`}
+              onClick={() => setFilter(tab)}
+            >
+              {tab.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="extensions-grid">
+        {filtered.map((ext) => (
+          <div key={ext.id} className={`extension-card ${ext.enabled ? 'is-enabled' : 'is-disabled'}`}>
+            <div className="extension-card-header">
+              <span className="extension-card-name">{ext.name}</span>
+              <span className={`extension-badge engine-${ext.engine}`}>{ext.engine}</span>
+            </div>
+            <p className="extension-card-note">{ext.note}</p>
+            <div className="extension-card-footer">
+              <span className="extension-badge category">{ext.category}</span>
+              <button
+                type="button"
+                className={`extension-toggle-btn ${ext.enabled ? 'is-on' : 'is-off'}`}
+                onClick={() => void toggle(ext.id, ext.enabled)}
+              >
+                {ext.enabled ? 'Active' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

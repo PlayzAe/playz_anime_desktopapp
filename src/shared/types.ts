@@ -175,7 +175,18 @@ export interface ResolvedStream {
 
 // ── Manga ───────────────────────────────────────────────────────────────────
 
-export type MangaProviderId = 'mangadex' | 'asura' | 'weebcentral' | 'flame' | 'mangapill';
+export type MangaProviderId = 'mangadex' | 'asura' | 'weebcentral' | 'flame' | 'mangapill' | (string & {});
+
+export interface MangaExtensionInfo {
+  id: string;
+  name: string;
+  baseUrl: string;
+  engine: 'madara' | 'mangastream' | 'mangabox' | 'custom';
+  category: 'manhwa' | 'manga' | 'manhua' | 'webtoon';
+  note: string;
+  enabled: boolean;
+  desktopOnly?: boolean;
+}
 
 /** Every chapter source, in the order they're shown. */
 export const MANGA_PROVIDERS: { id: MangaProviderId; name: string; note: string }[] = [
@@ -186,7 +197,7 @@ export const MANGA_PROVIDERS: { id: MangaProviderId; name: string; note: string 
   { id: 'mangapill', name: 'MangaPill', note: 'Fast, popular manga; a good fallback' },
 ];
 
-export const providerName = (id: MangaProviderId | null | undefined) => MANGA_PROVIDERS.find((p) => p.id === id)?.name ?? 'the source';
+export const providerName = (id: MangaProviderId | null | undefined) => MANGA_PROVIDERS.find((p) => p.id === id)?.name ?? (id || 'the source');
 
 export interface ProviderHealth {
   provider: MangaProviderId;
