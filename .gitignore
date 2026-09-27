@@ -1,12 +1,20 @@
+# Dependencies
 node_modules/
-out/
-dist/
-release/
-*.log
-build/.icon-render.html
+__pycache__/
+*.pyc
 
-# seanime is downloaded here as a design reference only (GPL-3.0). Never ship or commit it.
-reference/
+# Build output. api/_lib/ and api/blocklist.json stay committed: Vercel looks for its
+# functions before building, and the build regenerates them anyway.
+dist/
+server/dist/
+.vercel/
+
+# Server runtime data (feed cache, logs)
+server/data/
+
+# Logs & temporary video
+*.log
+*.mp4
 
 # Environment & IDE
 .env
@@ -15,29 +23,24 @@ reference/
 .vscode/
 .idea/
 .vs/
-*.suo
-*.user
 
-# Downloaded files & temporary caches
-*.mp4
-*.cbz
-*.zip
-downloads/
-userData/
-*.tmp
-*.temp
-
-# Scratch & scripts
+# Scratch, temporary files & test outputs
 *.py
 *.ps1
-__pycache__/
-*.pyc
+*.tmp
+*.temp
 scripts/temp*
 scripts/fix*
 scripts/update*
+scripts/*.html
 test-results/
+coverage/
 
 # OS metadata
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+out/
+release/
+reference/
