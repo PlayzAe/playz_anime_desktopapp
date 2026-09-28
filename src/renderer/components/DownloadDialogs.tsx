@@ -33,18 +33,22 @@ export function EpisodeDownloadDialog({ open, onClose, media, episodes, initial,
   const [audio, setAudio] = useState<Audio>(defaultAudio);
   const [quality, setQuality] = useState<QualityPref>(settings.quality);
   const [subTrack, setSubTrack] = useState<string>('default');
+  // Opened from the player on one episode: offer "just this one" first.
+  const single = initial && initial.from === initial.to ? initial.from : null;
+  const [scope, setScope] = useState<'this' | 'range' | 'all'>(single !== null ? 'this' : 'range');
   const hasDub = episodes.some((e) => e.dubUrl);
 
   useEffect(() => {
     if (!open) return;
     setFrom(initial?.from ?? first);
     setTo(initial?.to ?? last);
+    setScope(initial && initial.from === initial.to ? 'this' : 'range');
     setAudio(defaultAudio === 'dub' && hasDub ? 'dub' : 'sub');
     setQuality(settings.quality);
   }, [open, initial?.from, initial?.to, first, last, defaultAudio, hasDub, settings.quality]);
 
-  const lo = Math.min(from, to);
-  const hi = Math.max(from, to);
+  const lo = scope === 'all' ? first : scope === 'this' && single !== null ? single : Math.min(from, to);
+  const hi = scope === 'all' ? last : scope === 'this' && single !== null ? single : Math.max(from, to);
   const chosen = episodes.filter((e) => e.number >= lo && e.number <= hi);
   const playable = chosen.filter((e) => (audio === 'dub' ? e.dubUrl : e.subUrl));
   const skipped = chosen.length - playable.length;
@@ -72,7 +76,7 @@ export function EpisodeDownloadDialog({ open, onClose, media, episodes, initial,
     <Modal
       open={open}
       onClose={onClose}
-      title={isMovie ? `Download ${media.title}` : `Download episodes`}
+      title={isMovie ? `Download ${media.title}` : scope === 'this' && single !== null ? `Download episode ${single}` : 'Download episodes'}
       width={600}
       footer={
         <>
@@ -87,15 +91,28 @@ export function EpisodeDownloadDialog({ open, onClose, media, episodes, initial,
     >
       {!isMovie && episodes.length > 1 && (
         <div className="field">
-          <span className="field-label">Episodes</span>
-          <div className="field-row">
-            <input className="input is-num" type="number" min={first} max={last} value={from} aria-label="From episode" onChange={(e) => setFrom(Number(e.target.value) || first)} />
-            <span className="faint">to</span>
-            <input className="input is-num" type="number" min={first} max={last} value={to} aria-label="To episode" onChange={(e) => setTo(Number(e.target.value) || last)} />
-            <Button variant="quiet" size="sm" onClick={() => (setFrom(first), setTo(last))}>
-              All {episodes.length}
-            </Button>
-          </div>
+          <span className="field-label">Which episodes</span>
+          <Segmented
+            label="Which episodes"
+            value={scope}
+            onChange={setScope}
+            options={[
+              ...(single !== null ? [{ value: 'this' as const, label: `Only episode ${single}` }] : []),
+              { value: 'range' as const, label: 'From one episode to another' },
+              { value: 'all' as const, label: `All ${episodes.length}` },
+            ]}
+          />
+          {scope === 'range' && (
+            <div className="field-row" style={{ marginTop: 10 }}>
+              <span className="faint">Episode</span>
+              <input className="input is-num" type="number" min={first} max={last} value={from} aria-label="From episode" onChange={(e) => setFrom(Number(e.target.value) || first)} />
+              <span className="faint">to episode</span>
+              <input className="input is-num" type="number" min={first} max={last} value={to} aria-label="To episode" onChange={(e) => setTo(Number(e.target.value) || last)} />
+            </div>
+          )}
+          <span className="field-note">
+            {chosen.length === 1 ? `Episode ${lo}.` : `Episodes ${lo} to ${hi}: ${chosen.length} in total.`} {settings.maxDownloads ?? 3} download at a time; change that on the Downloads page.
+          </span>
         </div>
       )}
       <div className="field">
@@ -147,19 +164,47 @@ interface ChapterDialogProps {
   media: MediaSnapshot;
   chapters: Chapter[];
   unread: Chapter[];
+  /** The chapter you're reading, if any: "from here on" starts there. */
+  current?: string | null;
 }
 
-export function ChapterDownloadDialog({ open, onClose, media, chapters, unread }: ChapterDialogProps) {
+type ChapterScope = 'here' | 'unread' | 'range' | 'all';
+const num = (c: Chapter) => (c.number ? parseFloat(c.number) : NaN);
+
+export function ChapterDownloadDialog({ open, onClose, media, chapters, unread, current }: ChapterDialogProps) {
   const { settings, toast } = useApp();
   const readable = chapters.filter((c) => !c.externalUrl);
-  const [scope, setScope] = useState<'unread' | 'next10' | 'all'>('unread');
+  const numbered = readable.filter((c) => Number.isFinite(num(c)));
+  const firstNum = numbered.length ? Math.min(...numbered.map(num)) : 1;
+  const lastNum = numbered.length ? Math.max(...numbered.map(num)) : 1;
+  const here = current ? readable.find((c) => c.id === current) : undefined;
+  const hereNum = here ? num(here) : NaN;
 
-  const pick = scope === 'all' ? readable : scope === 'unread' ? unread.filter((c) => !c.externalUrl) : unread.filter((c) => !c.externalUrl).slice(0, 10);
+  const [scope, setScope] = useState<ChapterScope>(Number.isFinite(hereNum) ? 'here' : 'unread');
+  const [from, setFrom] = useState(firstNum);
+  const [to, setTo] = useState(lastNum);
+  useEffect(() => {
+    if (!open) return;
+    setScope(Number.isFinite(hereNum) ? 'here' : 'unread');
+    setFrom(Number.isFinite(hereNum) ? hereNum : firstNum);
+    setTo(lastNum);
+  }, [open, hereNum, firstNum, lastNum]);
+
+  const lo = Math.min(from, to);
+  const hi = Math.max(from, to);
+  const pick =
+    scope === 'all'
+      ? readable
+      : scope === 'unread'
+        ? unread.filter((c) => !c.externalUrl)
+        : scope === 'here'
+          ? numbered.filter((c) => num(c) >= hereNum)
+          : numbered.filter((c) => num(c) >= lo && num(c) <= hi);
 
   const start = async () => {
     const added = await window.playzanime.downloads.startMany(pick.map((chapter) => ({ kind: 'chapter', media, chapter })));
     onClose();
-    toast(added ? `Queued ${added} ${added === 1 ? 'chapter' : 'chapters'}` : 'Those are already downloading', {
+    toast(added ? `Queued ${added.toLocaleString()} ${added === 1 ? 'chapter' : 'chapters'}` : 'Those are already downloading', {
       action: { label: 'View', run: () => navigate('/downloads') },
     });
   };
@@ -169,13 +214,14 @@ export function ChapterDownloadDialog({ open, onClose, media, chapters, unread }
       open={open}
       onClose={onClose}
       title="Download chapters"
+      width={600}
       footer={
         <>
           <Button variant="quiet" onClick={onClose}>
             Cancel
           </Button>
           <Button variant="primary" icon="downloads" disabled={!pick.length} onClick={() => void start()}>
-            Download {pick.length} {pick.length === 1 ? 'chapter' : 'chapters'}
+            Download {pick.length.toLocaleString()} {pick.length === 1 ? 'chapter' : 'chapters'}
           </Button>
         </>
       }
@@ -187,14 +233,32 @@ export function ChapterDownloadDialog({ open, onClose, media, chapters, unread }
           value={scope}
           onChange={setScope}
           options={[
-            { value: 'unread', label: `Unread (${unread.filter((c) => !c.externalUrl).length})` },
-            { value: 'next10', label: 'Next 10 unread' },
-            { value: 'all', label: `All (${readable.length})` },
+            ...(Number.isFinite(hereNum) ? [{ value: 'here' as const, label: `From chapter ${here?.number} on` }] : []),
+            { value: 'unread' as const, label: `Unread (${unread.filter((c) => !c.externalUrl).length.toLocaleString()})` },
+            { value: 'range' as const, label: 'A range' },
+            { value: 'all' as const, label: `All (${readable.length.toLocaleString()})` },
           ]}
         />
+        {scope === 'range' && (
+          <div className="field-row" style={{ marginTop: 10 }}>
+            <span className="faint">Chapter</span>
+            <input className="input is-num" type="number" min={firstNum} max={lastNum} value={from} aria-label="From chapter" onChange={(e) => setFrom(Number(e.target.value) || firstNum)} />
+            <span className="faint">to chapter</span>
+            <input className="input is-num" type="number" min={firstNum} max={lastNum} value={to} aria-label="To chapter" onChange={(e) => setTo(Number(e.target.value) || lastNum)} />
+            {[10, 50, 100].map((n) => (
+              <Button key={n} variant="quiet" size="sm" onClick={() => setTo(Math.min(lastNum, lo + n - 1))}>
+                Next {n}
+              </Button>
+            ))}
+          </div>
+        )}
+        <span className="field-note">
+          {pick.length ? `${pick.length.toLocaleString()} ${pick.length === 1 ? 'chapter' : 'chapters'}` : 'No chapters'}
+          {scope === 'range' ? ` between chapter ${lo} and ${hi}` : ''}. {settings.maxDownloads ?? 3} download at a time; change that on the Downloads page.
+        </span>
       </div>
       <p className="field-note" style={{ marginTop: 18 }}>
-        Each chapter becomes a .cbz file in <strong>{settings.mangaDir}</strong>, readable in any comic reader.
+        Each chapter becomes a .cbz file in <strong>{settings.mangaDir}</strong>, readable in any comic reader. A single chapter downloads from the button on its row.
       </p>
     </Modal>
   );

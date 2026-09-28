@@ -303,6 +303,7 @@ function SourceSwitcherDialog({ open, onClose, list, onSelect }: SourceSwitcherP
 }
 
 function ChapterPanel({ media, snap, list, read, setRead, currentId, onProvider, onRefresh }: PanelProps) {
+  const { toast } = useApp();
   const [newestFirst, setNewestFirst] = useState(true);
   const [filter, setFilter] = useState('');
   const [dialog, setDialog] = useState(false);
@@ -354,8 +355,11 @@ function ChapterPanel({ media, snap, list, read, setRead, currentId, onProvider,
     );
   }
 
-  // Saving chapters lives in the Windows app; every download button explains that.
-  const download = (_c: Chapter) => setDialog(true);
+  // The download button on a chapter row saves just that chapter; the Download button above opens the choices.
+  const download = async (c: Chapter) => {
+    await window.playzanime.downloads.start({ kind: 'chapter', media: snap, chapter: c });
+    toast(`Downloading ${c.number ? `chapter ${c.number}` : c.title || 'the chapter'}`, { action: { label: 'View', run: () => navigate('/downloads') } });
+  };
 
   return (
     <div className="eps">
@@ -474,7 +478,7 @@ function ChapterPanel({ media, snap, list, read, setRead, currentId, onProvider,
         </div>
       )}
 
-      <ChapterDownloadDialog open={dialog} onClose={() => setDialog(false)} media={snap} chapters={list.chapters} unread={unread} />
+      <ChapterDownloadDialog open={dialog} onClose={() => setDialog(false)} media={snap} chapters={list.chapters} unread={unread} current={currentId} />
       <SourceSwitcherDialog
         open={sourceDialog}
         onClose={() => setSourceDialog(false)}

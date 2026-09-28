@@ -10,9 +10,13 @@ import type {
   DownloadJob,
   DownloadRequest,
   EpisodeDownloadRequest,
+  Media,
+  MediaSnapshot,
+  MediaType,
   QualityPref,
   StreamVariant,
 } from '../shared/types';
+import * as anilist from './anilist';
 import { resolveStream } from './extractor';
 import { ensureFfmpeg } from './ffmpeg';
 import { getBuffer, getText, HttpError, retry } from './http';
@@ -68,7 +72,8 @@ function prepareParts(dir: string, signature: string): Map<number, number> {
 
 const dropParts = (jobId: string) => fs.rm(partDir(jobId), { recursive: true, force: true }, () => {});
 
-const MAX_ACTIVE_JOBS = 2;
+/** How many downloads run at once: the setting, kept between 1 and 8. */
+const maxActive = () => Math.min(8, Math.max(1, Math.round(store().settings.maxDownloads || 3)));
 const SEGMENT_CONCURRENCY = 4;
 const PAGE_CONCURRENCY = 4;
 const READ_AHEAD = 24;
@@ -323,26 +328,50 @@ function orderedPool<T>(
 
 type ProgressListener = (fraction: number | null) => void;
 
+/** The details a download keeps about its series, from an AniList result. */
+function snapshotOf(m: Media, type: MediaType): MediaSnapshot {
+  return {
+    id: m.id,
+    type,
+    title: m.title.english || m.title.romaji || m.title.native || 'Untitled',
+    romaji: m.title.romaji ?? null,
+    native: m.title.native ?? null,
+    cover: m.coverImage?.extraLarge || m.coverImage?.large || m.coverImage?.medium || '',
+    banner: m.bannerImage ?? null,
+    color: m.coverImage?.color ?? null,
+    format: m.format ?? null,
+    episodes: m.episodes ?? null,
+    chapters: m.chapters ?? null,
+    year: m.seasonYear ?? m.startDate?.year ?? null,
+    status: m.status ?? null,
+    country: m.countryOfOrigin ?? null,
+  };
+}
+
 class Downloader {
   private jobs: DownloadJob[] = [];
   private controllers = new Map<string, AbortController>();
   private emitTimer: NodeJS.Timeout | null = null;
+  private persistTimer: NodeJS.Timeout | null = null;
+  /** Running jobs being stopped on purpose: paused keeps their parts, cancelled removes them. */
+  private stopping = new Map<string, 'pause' | 'cancel'>();
   private progressListener: ProgressListener | null = null;
 
   constructor() {
     this.jobs = store()
       .downloadRecords()
       .map((j) =>
-        // Jobs that were still running when the app closed cannot resume mid-stream.
+        // Unfinished jobs come back paused, keeping what they saved: Resume (or Resume all)
+        // carries on. Nothing starts downloading by itself when the app opens.
         FINISHED.includes(j.state)
           ? j
           : {
               ...j,
-              state: 'error' as const,
+              state: 'paused' as const,
               speed: 0,
+              stage: null,
               // The saved record lags behind the disk; count what actually made it.
               partsDone: existingParts(partDir(j.id)).size || j.partsDone,
-              error: 'Stopped when the app closed. Resume picks up where it left off.',
             },
       );
   }
@@ -383,12 +412,24 @@ class Downloader {
       if (this.emitTimer) clearTimeout(this.emitTimer);
       send();
     } else if (!this.emitTimer) {
-      this.emitTimer = setTimeout(send, 250);
+      // Big queues (thousands of chapters) are sent less often so the window stays responsive.
+      this.emitTimer = setTimeout(send, this.jobs.length > 300 ? 700 : 250);
     }
   }
 
-  /** Unfinished jobs are saved too, so they can be resumed after a restart. */
+  /**
+   * Unfinished jobs are saved too, so they can be resumed after a restart. Saves are batched:
+   * with thousands of jobs, writing the list on every finished chapter would stall the app.
+   */
   private persist() {
+    if (this.persistTimer) return;
+    this.persistTimer = setTimeout(() => this.flush(), 600);
+  }
+
+  /** Writes the list now (also used when the app quits). */
+  flush() {
+    if (this.persistTimer) clearTimeout(this.persistTimer);
+    this.persistTimer = null;
     store().saveDownloadRecords(this.jobs.map((j) => ({ ...j })));
   }
 
@@ -400,7 +441,7 @@ class Downloader {
 
   private isDuplicate(req: DownloadRequest) {
     return this.jobs.find((j) => {
-      if (!ACTIVE.includes(j.state) || j.media.id !== req.media.id || j.kind !== req.kind) return false;
+      if (!(ACTIVE.includes(j.state) || j.state === 'paused') || j.media.id !== req.media.id || j.kind !== req.kind) return false;
       return req.kind === 'episode' ? j.episode === req.episode && j.audio === req.audio : j.chapter?.id === req.chapter.id;
     });
   }
@@ -455,27 +496,75 @@ class Downloader {
     return added;
   }
 
+  /** Cancelling removes the download and whatever it had saved. Finished downloads aren't touched. */
   cancel(id: string) {
-    const job = this.find(id);
-    if (!job) return;
-    if (job.state === 'queued') {
-      this.update(job, { state: 'cancelled', finishedAt: Date.now() });
-      return;
+    this.cancelMany([id]);
+  }
+
+  /** Pauses downloads, keeping what they've saved. No ids means every unfinished download. */
+  pauseMany(ids?: string[]) {
+    const pick = ids ? new Set(ids) : null;
+    for (const job of this.jobs) {
+      if (pick && !pick.has(job.id)) continue;
+      if (job.state === 'queued') Object.assign(job, { state: 'paused', speed: 0, stage: null });
+      else if (this.controllers.has(job.id)) {
+        this.stopping.set(job.id, 'pause');
+        this.controllers.get(job.id)?.abort();
+      }
     }
-    this.controllers.get(id)?.abort();
+    this.persist();
+    this.emit(true);
+  }
+
+  /** Resumes paused (and failed) downloads. No ids means all of them. */
+  resumeMany(ids?: string[]) {
+    const pick = ids ? new Set(ids) : null;
+    for (const job of this.jobs) {
+      if (pick && !pick.has(job.id)) continue;
+      if (job.state === 'paused' || job.state === 'error' || job.state === 'cancelled') {
+        // Progress is kept: the run recounts the saved parts and continues from there.
+        Object.assign(job, { state: 'queued', error: null, stage: null, speed: 0, finishedAt: null });
+      }
+    }
+    this.persist();
+    this.emit(true);
+    this.pump();
+  }
+
+  /** Cancels and deletes downloads that haven't finished. No ids means all of them. */
+  cancelMany(ids?: string[]) {
+    const pick = ids ? new Set(ids) : null;
+    const drop = new Set<string>();
+    for (const job of this.jobs) {
+      if (job.state === 'done' || (pick && !pick.has(job.id))) continue;
+      if (this.controllers.has(job.id)) {
+        // Running: stop it; the run removes it once it has let go of its files.
+        this.stopping.set(job.id, 'cancel');
+        this.controllers.get(job.id)?.abort();
+      } else {
+        drop.add(job.id);
+        dropParts(job.id);
+      }
+    }
+    this.jobs = this.jobs.filter((j) => !drop.has(j.id));
+    this.persist();
+    this.emit(true);
+  }
+
+  pause(id: string) {
+    this.pauseMany([id]);
   }
 
   retry(id: string) {
-    const job = this.find(id);
-    if (!job || !FINISHED.includes(job.state) || job.state === 'done') return;
-    // Progress is kept: the run recounts the saved parts and continues from there.
-    this.update(job, { state: 'queued', error: null, stage: null, speed: 0, finishedAt: null });
-    this.pump();
+    this.resumeMany([id]);
   }
 
   remove(id: string, deleteFile = false) {
     const job = this.find(id);
-    this.cancel(id);
+    if (job && this.controllers.has(id)) {
+      this.stopping.set(id, 'cancel');
+      this.controllers.get(id)?.abort();
+    }
     if (deleteFile && job?.outputFile) {
       for (const f of [job.outputFile, job.subtitleFile]) if (f) fs.rm(f, { force: true }, () => {});
     }
@@ -491,6 +580,111 @@ class Downloader {
     this.jobs = this.jobs.filter((j) => !FINISHED.includes(j.state) || j.state === 'done');
     this.persist();
     this.emit(true);
+  }
+
+  /**
+   * Finds episodes and chapters in the download folders that aren't in the list (after the
+   * list was lost, a reinstall, or files copied in from another PC) and adds them back as
+   * finished downloads. Returns how many were added.
+   */
+  async rescan(): Promise<number> {
+    const known = new Set(this.jobs.map((j) => j.outputFile?.toLowerCase()).filter(Boolean));
+    const { animeDir, mangaDir } = store().settings;
+    const list = async (dir: string, depth: number): Promise<string[]> => {
+      const entries = await fs.promises.readdir(dir, { withFileTypes: true }).catch(() => []);
+      const out: string[] = [];
+      for (const e of entries) {
+        const full = path.join(dir, e.name);
+        if (e.isDirectory() && depth > 0) out.push(...(await list(full, depth - 1)));
+        else if (e.isFile()) out.push(full);
+      }
+      return out;
+    };
+    // Series found on disk get a stable id of their own (negative, so it never clashes with AniList's).
+    const idOf = (title: string) => -(parseInt(crypto.createHash('sha1').update(title.toLowerCase()).digest('hex').slice(0, 8), 16) % 1_000_000_000) - 1;
+    const found: DownloadJob[] = [];
+    const add = async (file: string, make: (stat: fs.Stats) => Omit<DownloadJob, 'id' | 'state' | 'progress' | 'speed' | 'partsDone' | 'bytes' | 'createdAt' | 'finishedAt' | 'outputFile'>) => {
+      if (known.has(file.toLowerCase())) return;
+      const stat = await fs.promises.stat(file).catch(() => null);
+      if (!stat) return;
+      found.push({ ...make(stat), id: crypto.randomUUID(), state: 'done', progress: 1, speed: 0, partsDone: 0, bytes: stat.size, createdAt: stat.mtimeMs, finishedAt: stat.mtimeMs, outputFile: file });
+    };
+
+    // PlayzAnime\<Show>\[Season N\]<Show>_E05_720p[_dub].mp4
+    for (const file of await list(animeDir, 2)) {
+      if (!/\.mp4$/i.test(file)) continue;
+      const rel = path.relative(animeDir, file).split(path.sep);
+      const show = rel.length > 1 ? rel[0] : path.basename(file).replace(/_.*$/, '');
+      const ep = /_E(\d+)/i.exec(path.basename(file));
+      const res = /_(\d{3,4}p)/i.exec(path.basename(file));
+      const season = rel.length > 2 ? /Season (\d+)/i.exec(rel[1]) : null;
+      const title = season ? `${show} Season ${season[1]}` : show;
+      const base = file.replace(/\.mp4$/i, '');
+      const vtt = (await fs.promises.readdir(path.dirname(file)).catch(() => [] as string[])).find((f) => f.startsWith(path.basename(base) + '.') && f.endsWith('.vtt'));
+      await add(file, () => ({
+        kind: 'episode',
+        media: { id: idOf(title), type: 'ANIME', title, cover: '' },
+        label: ep ? episodeLabel(Number(ep[1])) : path.basename(base),
+        episode: ep ? Number(ep[1]) : 1,
+        audio: /_dub\b/i.test(file) ? 'dub' : 'sub',
+        resolution: res ? res[1] : null,
+        subtitleFile: vtt ? path.join(path.dirname(file), vtt) : null,
+        partsTotal: 0,
+      }));
+    }
+
+    // PlayzManga\<Series>\<Series>_Ch012.cbz
+    for (const file of await list(mangaDir, 1)) {
+      if (!/\.cbz$/i.test(file)) continue;
+      const rel = path.relative(mangaDir, file).split(path.sep);
+      const series = rel.length > 1 ? rel[0] : path.basename(file).replace(/_Ch.*$/i, '');
+      const ch = /_Ch(\d+(?:\.\d+)?)/i.exec(path.basename(file));
+      const number = ch ? String(Number(ch[1])) : null;
+      await add(file, () => ({
+        kind: 'chapter',
+        media: { id: idOf(series), type: 'MANGA', title: series, cover: '' },
+        label: chapterLabel(number),
+        chapter: { id: `file:${file}`, provider: 'mangadex', number, title: null, volume: null, group: null, pages: null, publishedAt: null, externalUrl: null },
+        partsTotal: 0,
+      }));
+    }
+
+    if (found.length) {
+      await this.identify(found);
+      this.jobs.push(...found.sort((a, b) => b.createdAt - a.createdAt));
+      this.persist();
+      this.emit(true);
+      log.info(`rescan found ${found.length} download(s) on disk`);
+    }
+    return found.length;
+  }
+
+  /**
+   * Series found on disk only know their folder name. Give them their real details (cover, id,
+   * manga or manhwa), first from series already in the list, else from an AniList search.
+   */
+  private async identify(found: DownloadJob[]) {
+    const norm = (t: string) => safeName(t).toLowerCase();
+    const known = new Map<string, MediaSnapshot>();
+    for (const j of this.jobs) if (j.media.id > 0) known.set(`${j.kind}:${norm(j.media.title)}`, j.media);
+    const bySeries = new Map<string, DownloadJob[]>();
+    for (const j of found) {
+      const key = `${j.kind}:${norm(j.media.title)}`;
+      bySeries.set(key, [...(bySeries.get(key) ?? []), j]);
+    }
+    for (const [key, jobs] of bySeries) {
+      let media = known.get(key);
+      if (!media) {
+        const type: MediaType = jobs[0].kind === 'episode' ? 'ANIME' : 'MANGA';
+        try {
+          const hit = (await anilist.browse({ search: jobs[0].media.title, type, page: 1 })).items[0];
+          if (hit) media = snapshotOf(hit, type);
+        } catch {
+          /* offline: keep the folder name */
+        }
+      }
+      if (media) for (const j of jobs) j.media = media;
+    }
   }
 
   /** Finished downloads whose file was moved or deleted outside the app. */
@@ -515,7 +709,7 @@ class Downloader {
 
   private pump() {
     const running = this.jobs.filter((j) => ['resolving', 'downloading', 'muxing'].includes(j.state)).length;
-    let slots = MAX_ACTIVE_JOBS - running;
+    let slots = maxActive() - running;
     for (const job of [...this.jobs].reverse()) {
       if (slots <= 0) break;
       if (job.state !== 'queued') continue;
@@ -535,23 +729,24 @@ class Downloader {
       this.notify(job);
       log.info(`finished ${job.outputFile}`);
     } catch (err) {
-      const cancelled = ctrl.signal.aborted;
-      // Cancelling means the user doesn't want it; any other failure keeps parts for Resume.
-      if (cancelled) dropParts(job.id);
-      this.update(
-        job,
-        {
-          state: cancelled ? 'cancelled' : 'error',
-          speed: 0,
-          stage: null,
-          error: cancelled ? null : err instanceof Error ? err.message : String(err),
-          finishedAt: Date.now(),
-        },
-        true,
-      );
-      if (!cancelled) log.error(`job ${job.id} failed`, err);
+      const stop = ctrl.signal.aborted ? (this.stopping.get(job.id) ?? 'cancel') : null;
+      if (stop === 'cancel') {
+        // Cancelled: the download and its saved parts go away.
+        dropParts(job.id);
+        this.jobs = this.jobs.filter((j) => j.id !== job.id);
+        this.persist();
+        this.emit(true);
+      } else if (stop === 'pause') {
+        // Paused: parts stay, so Resume carries on from here.
+        this.update(job, { state: 'paused', speed: 0, stage: null }, true);
+      } else {
+        // Any other failure keeps parts for Resume.
+        this.update(job, { state: 'error', speed: 0, stage: null, error: err instanceof Error ? err.message : String(err), finishedAt: Date.now() }, true);
+        log.error(`job ${job.id} failed`, err);
+      }
     } finally {
       this.controllers.delete(job.id);
+      this.stopping.delete(job.id);
       this.pump();
     }
   }

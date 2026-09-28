@@ -224,6 +224,15 @@ export function Settings() {
                     ]}
                   />
                 </Row>
+                <Row title="Downloads at once" note="How many episodes or chapters download at the same time. More is faster on a good connection; fewer is kinder to a slow one.">
+                  <Select
+                    label="Downloads at once"
+                    value={settings.maxDownloads ?? 3}
+                    onChange={(v) => set('maxDownloads', v)}
+                    width={120}
+                    options={[1, 2, 3, 4, 5, 6, 8].map((n) => ({ value: n, label: String(n) }))}
+                  />
+                </Row>
                 <Row title="Notify when finished" note="A Windows notification when the queue empties.">
                   <Switch checked={settings.notifyDownloads} onChange={(v) => set('notifyDownloads', v)} label="Notify when downloads finish" />
                 </Row>

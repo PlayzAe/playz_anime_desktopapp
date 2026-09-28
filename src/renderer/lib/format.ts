@@ -38,6 +38,7 @@ export function snapshot(m: Media, lang: TitleLang = 'english'): MediaSnapshot {
     episodes: m.episodes ?? null,
     year: m.seasonYear ?? m.startDate?.year ?? null,
     status: m.status ?? null,
+    country: m.countryOfOrigin ?? null,
   };
 }
 

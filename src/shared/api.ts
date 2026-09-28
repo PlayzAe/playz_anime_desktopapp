@@ -90,12 +90,22 @@ export interface PlayzAnimeApi {
     startMany(reqs: DownloadRequest[]): Promise<number>;
     cancel(id: string): Promise<void>;
     retry(id: string): Promise<void>;
+    /** Pauses a download, keeping what it has saved. */
+    pause(id: string): Promise<void>;
+    /** No ids: every unfinished download. */
+    pauseMany(ids?: string[]): Promise<void>;
+    /** Resumes paused and failed downloads. No ids: all of them. */
+    resumeMany(ids?: string[]): Promise<void>;
+    /** Cancels and deletes unfinished downloads. No ids: all of them. */
+    cancelMany(ids?: string[]): Promise<void>;
     remove(id: string, deleteFile?: boolean): Promise<void>;
     clearFinished(): Promise<void>;
     open(id: string): Promise<boolean>;
     reveal(id: string): Promise<boolean>;
     /** Ids of finished downloads whose file is no longer where it was saved. */
     missing(): Promise<string[]>;
+    /** Adds episodes and chapters found in the download folders that the list doesn't know. */
+    rescan(): Promise<number>;
     onUpdate(listener: (jobs: DownloadJob[]) => void): () => void;
   };
   app: {

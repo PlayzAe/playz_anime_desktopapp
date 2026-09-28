@@ -324,6 +324,8 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', () => {
+  // Download records are saved in batches; write the latest before the store is flushed.
+  downloader().flush();
   store().flush();
 });
 

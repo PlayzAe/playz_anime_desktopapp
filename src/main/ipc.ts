@@ -155,11 +155,17 @@ export function registerIpc(hooks: IpcHooks) {
   handle('downloads:startMany', (reqs: DownloadRequest[]) => downloader().startMany((reqs ?? []).filter(validRequest)));
   handle('downloads:cancel', (id: string) => downloader().cancel(String(id)));
   handle('downloads:retry', (id: string) => downloader().retry(String(id)));
+  handle('downloads:pause', (id: string) => downloader().pause(String(id)));
+  const ids = (v: unknown) => (Array.isArray(v) ? v.map(String) : undefined);
+  handle('downloads:pauseMany', (list?: string[]) => downloader().pauseMany(ids(list)));
+  handle('downloads:resumeMany', (list?: string[]) => downloader().resumeMany(ids(list)));
+  handle('downloads:cancelMany', (list?: string[]) => downloader().cancelMany(ids(list)));
   handle('downloads:remove', (id: string, deleteFile?: boolean) => downloader().remove(String(id), Boolean(deleteFile)));
   handle('downloads:clearFinished', () => downloader().clearFinished());
   handle('downloads:open', (id: string) => downloader().open(String(id)));
   handle('downloads:reveal', (id: string) => downloader().reveal(String(id)));
   handle('downloads:missing', () => downloader().missingFiles());
+  handle('downloads:rescan', () => downloader().rescan());
 
   // App
   handle('app:info', () => ({

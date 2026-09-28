@@ -1,7 +1,7 @@
 {
   "name": "playzanime",
   "productName": "PlayzAnime",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "PlayzAnime: watch and download anime, read and download manga.",
   "private": true,
   "main": "out/main/index.cjs",

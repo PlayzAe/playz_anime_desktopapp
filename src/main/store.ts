@@ -80,6 +80,7 @@ function defaultSettings(): Settings {
     adblock: true,
     hideAdult: true,
     notifyDownloads: true,
+    maxDownloads: 3,
     dataSaver: false,
   };
 }
@@ -102,7 +103,8 @@ function defaults(): StoreData {
 }
 
 const MAX_HISTORY = 80;
-const MAX_DOWNLOAD_RECORDS = 300;
+/** Failed and cancelled entries kept; finished and unfinished downloads are never dropped. */
+const MAX_FAILED_RECORDS = 200;
 
 class Store {
   private data: StoreData;
@@ -416,7 +418,10 @@ class Store {
   }
 
   saveDownloadRecords(jobs: DownloadJob[]) {
-    this.data.downloads = jobs.slice(0, MAX_DOWNLOAD_RECORDS);
+    // Finished downloads are the offline library and unfinished ones are the queue, so both are
+    // always kept, however many there are. Only old failed and cancelled entries are trimmed.
+    let failed = 0;
+    this.data.downloads = jobs.filter((j) => !(j.state === 'error' || j.state === 'cancelled') || ++failed <= MAX_FAILED_RECORDS);
     this.schedule();
   }
 }

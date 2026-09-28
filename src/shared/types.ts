@@ -273,6 +273,8 @@ export interface MediaSnapshot {
   chapters?: number | null;
   year?: number | null;
   status?: MediaStatus | null;
+  /** AniList's country of origin: JP manga, KR manhwa, CN or TW manhua. */
+  country?: string | null;
 }
 
 export interface LibraryEntry {
@@ -330,13 +332,15 @@ export interface Settings {
   adblock: boolean;
   hideAdult: boolean;
   notifyDownloads: boolean;
+  /** How many downloads run at the same time (1 to 8). */
+  maxDownloads: number;
   /** Smaller video buffers, capped quality, compressed manga pages. For metered connections. */
   dataSaver: boolean;
 }
 
 // ── Downloads ───────────────────────────────────────────────────────────────
 
-export type DownloadState = 'queued' | 'resolving' | 'downloading' | 'muxing' | 'done' | 'error' | 'cancelled';
+export type DownloadState = 'queued' | 'resolving' | 'downloading' | 'muxing' | 'paused' | 'done' | 'error' | 'cancelled';
 
 export interface EpisodeDownloadRequest {
   kind: 'episode';
