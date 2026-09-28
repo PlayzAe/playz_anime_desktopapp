@@ -18,7 +18,7 @@
 </p>
 
 <div align="center">
-  <a href="https://github.com/PlayzAe/playz_anime">
+  <a href="https://github.com/PlayzAe/playz_anime_desktopapp">
     <img src="https://img.shields.io/github/stars/PlayzAe/playz_anime?style=flat-square&color=crimson" alt="GitHub Stars" />
   </a>
   <a href="https://playz-anime.onrender.com">
